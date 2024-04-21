@@ -233,3 +233,25 @@ classDiagram
         + bool save_as_image(String path)
     }
 ```
+
+## Setup
+First of all create a `virtual environment`:
+
+```bash
+python3 -m venv ./venv
+source ./venv/bin/activate # Linux and MacOS
+./venv/Scripts/activate # Windows
+```
+
+Then install all required packages `see dependencies in pyproject.toml`:
+
+```bash
+pip3 install .
+```
+
+## Tests
+In order to run the tests execute the following command:
+
+```bash
+python3 -m unittest discover -v
+```
