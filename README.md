@@ -2,6 +2,9 @@
 SAD (Software Architecture and Design) Project @FHGR
 
 ## Architecture
+The architecture is split into different parts. First the differente Context (building blocks) of the Application are explained. Afterwards it is described how these builidng blocks interact with each other.
+
+### Context
 The whole applications is split up into `different context`. Each context serves a specific puprose. Communication between contexts is done via the `Aggregate Root` Object. Below you can find a short explanation for each context and its purpose
 
 |Context|Description|
@@ -232,6 +235,18 @@ classDiagram
         + WeatherChartAnalysisResult content()
         + bool save_as_image(String path)
     }
+```
+
+### Context Mapping
+
+```mermaid
+---
+title: Context Mapping
+---
+flowchart BT
+    AnalyzeContext --> DataContext
+    DashboardContext --> AnalyzeContext
+    DashboardContext --> AnalysisSettingsContext
 ```
 
 ## Setup
