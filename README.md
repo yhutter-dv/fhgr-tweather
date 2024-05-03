@@ -1,4 +1,4 @@
-# fhgr-tweather
+# :sun_behind_small_cloud: fhgr-tweather
 SAD (Software Architecture and Design) Project @FHGR
 
 ## Architecture
