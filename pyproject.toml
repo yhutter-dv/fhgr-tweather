@@ -5,6 +5,7 @@ description = "Tweather App for SAD Module @FHGR"
 dependencies = []
 
 [tool.pyright]
+include = ["."]
 exclude = ["venv"]
 venvPath = "."
 venv = "venv"

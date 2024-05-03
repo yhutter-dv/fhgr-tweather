@@ -4,6 +4,11 @@ SAD (Software Architecture and Design) Project @FHGR
 ## Architecture
 The architecture is split into different parts. First the differente Context (building blocks) of the Application are explained. Afterwards it is described how these builidng blocks interact with each other.
 
+## Daten
+The data for the city locations in Switzerland was retrieved from [here](https://www.swisstopo.admin.ch/de/amtliches-ortschaftenverzeichnis). The data was preprocessed and saved as json file. For this purpose a Script called `preprocess_city_names.py` was written.
+
+It converts LV95 coordinates into their corresponding Longitude and Latitude values.
+
 ### Context
 The whole applications is split up into `different context`. Each context serves a specific puprose. Communication between contexts is done via the `Aggregate Root` Object. Below you can find a short explanation for each context and its purpose
 
