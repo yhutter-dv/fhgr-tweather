@@ -4,6 +4,9 @@ version = "0.1"
 description = "Tweather App for SAD Module @FHGR"
 dependencies = []
 
+[tool.setuptools]
+py-modules = []
+
 [tool.pyright]
 include = ["."]
 exclude = ["venv"]
