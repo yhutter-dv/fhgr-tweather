@@ -108,10 +108,16 @@ requestHistorical
 '''
 
 print(makeRequest(requestToday))
+#{"time":"2024-04-30T12:00","temperature_2m":21.6,"relative_humidity_2m":41,"precipitation":0.0,"weather_code":1,"surface_pressure":948.7,"cloud_cover":41,"wind_speed_10m":14.6,"wind_direction_10m":200}
+
 print("")
 print(makeRequest(requestForecast))
+#{"time":"2024-05-02T12:00","temperature_2m":17.6,"relative_humidity_2m":49,"precipitation":0.0,"weather_code":2,"surface_pressure":933.0,"cloud_cover":64,"wind_speed_10m":11.3,"wind_direction_10m":202}
+
 print("")
 print(makeRequest(requestHistorical))
+#{"time":"2023-05-02T12:00","temperature_2m":12.4,"relative_humidity_2m":72,"precipitation":0.4,"weather_code":51,"surface_pressure":951.7,"cloud_cover":69,"wind_speed_10m":7.8,"wind_direction_10m":22}
+
 
 
 
