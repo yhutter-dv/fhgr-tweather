@@ -2,12 +2,14 @@ from data.weather_data_request import WeatherDataRequest
 import pandas as pd
 from datetime import datetime
 
+from data.weather_data_response import WeatherDataResponse
+
 
 class WeatherApi:
     def __init__(self):
         pass
 
-    def make_request(self, request: WeatherDataRequest) -> dict | None:
+    def make_request(self, request: WeatherDataRequest) -> WeatherDataResponse | None:
         city = request.location.name
 
         # TODO use longitude and latitude from location
@@ -52,10 +54,17 @@ class WeatherApi:
             weather_url = "https://archive-api.open-meteo.com/v1/era5?latitude={0}&longitude={1}&start_date={2}&end_date={3}&hourly={4}".format(
                 lat, lon, start, stop, metric
             )
-            weather_answer = unpackHourly(pd.read_json(weather_url)["hourly"], date)
+            weather_answer = self.unpackHourly(
+                pd.read_json(weather_url)["hourly"], date
+            )
 
         result = weather_answer.to_json(orient="columns")
-        return result
+
+        value = result[metric]
+        response = WeatherDataResponse(
+            location=request.location, metric=metric, date=date, value=value
+        )
+        return response
 
     def unpackHourly(self, df_hours: pd.DataFrame, date: datetime) -> pd.DataFrame:
         mytime = datetime.strptime("1200", "%H%M").time()
