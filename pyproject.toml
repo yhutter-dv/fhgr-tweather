@@ -3,7 +3,8 @@ name = "fhgr-tweather"
 version = "0.1"
 description = "Tweather App for SAD Module @FHGR"
 dependencies = [
-    "pandas"
+    "pandas",
+    "pyproj"
 ]
 
 [tool.setuptools]
