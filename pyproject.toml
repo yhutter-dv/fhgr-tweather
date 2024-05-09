@@ -4,7 +4,8 @@ version = "0.1"
 description = "Tweather App for SAD Module @FHGR"
 dependencies = [
     "pandas",
-    "pyproj"
+    "pyproj",
+    "openmeteo-requests"
 ]
 
 [tool.setuptools]

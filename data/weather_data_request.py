@@ -7,5 +7,5 @@ from analysis_settings.weather_metric import WeatherMetric
 @dataclass
 class WeatherDataRequest:
     location: WeatherLocation
-    date: datetime.datetime
+    date: datetime.date
     metric: WeatherMetric
