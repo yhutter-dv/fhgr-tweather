@@ -1,6 +1,6 @@
 from dataclasses import dataclass
+from datetime import date
 
-from shared.date_time_range import DateTimeRange
 from analysis_settings.weather_location import WeatherLocation
 from analysis_settings.weather_metric import WeatherMetric
 
@@ -9,4 +9,4 @@ from analysis_settings.weather_metric import WeatherMetric
 class WeatherAnalysisSample:
     location: WeatherLocation
     metric: WeatherMetric
-    date_time_range: DateTimeRange
+    date: date
