@@ -1,6 +1,7 @@
 import datetime
 import unittest
 
+from analysis_settings.weather_analysis_settings import WeatherAnalysisSettings
 from analysis_settings.weather_analysis_settings_manager import (
     WeatherAnalysisSettingsManager,
 )
@@ -8,11 +9,9 @@ from analysis_settings.weather_analysis_settings_subscriber import (
     WeatherAnalysisSettingsSubscriber,
 )
 from analysis_settings.weather_analysis_type import WeatherAnalysisType
-from analysis_settings.weather_location_repository import WeatherLocationRepository
 from analysis_settings.weather_location import WeatherLocation
+from analysis_settings.weather_location_repository import WeatherLocationRepository
 from analysis_settings.weather_metric import WeatherMetric
-from analysis_settings.weather_analysis_settings import WeatherAnalysisSettings
-from shared.date_time_range import DateTimeRange
 
 
 class TestWeatherAnalysisSettingsManager(
@@ -43,15 +42,13 @@ class TestWeatherAnalysisSettingsManager(
         metric = WeatherMetric.RAIN
         analysis_type = WeatherAnalysisType.TEXT
         now = datetime.datetime.now()
-        end = now - datetime.timedelta(days=3)
-        time_range = DateTimeRange(begin=now, end=end)
 
         self._settings_manager.update_settings(
             location_name_one=location_name_one,
             location_name_two=location_name_two,
             metric=metric,
             analysis_type=analysis_type,
-            time_range=time_range,
+            date=now,
         )
 
         self.assertIsNotNone(self._settings)
@@ -67,7 +64,7 @@ class TestWeatherAnalysisSettingsManager(
             location_name_two=location_name_two,
             metric=metric,
             analysis_type=WeatherAnalysisType.CHART,
-            time_range=time_range,
+            date=now,
         )
 
         if self._settings is None:
@@ -81,15 +78,13 @@ class TestWeatherAnalysisSettingsManager(
         metric = WeatherMetric.RAIN
         analysis_type = WeatherAnalysisType.TEXT
         now = datetime.datetime.now()
-        end = now - datetime.timedelta(days=3)
-        time_range = DateTimeRange(begin=now, end=end)
 
         self._settings_manager.update_settings(
             location_name_one=location_name_one,
             location_name_two=location_name_two,
             metric=metric,
             analysis_type=analysis_type,
-            time_range=time_range,
+            date=now,
         )
 
         self.assertIsNotNone(self._settings)

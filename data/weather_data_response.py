@@ -6,7 +6,10 @@ from analysis_settings.weather_metric import WeatherMetric
 
 
 @dataclass
-class WeatherAnalysisSample:
+class WeatherDataResponse:
     location: WeatherLocation
-    metric: WeatherMetric
     date: date
+    metric: WeatherMetric
+    value: float | None
+    has_error: bool
+    error_reason: str

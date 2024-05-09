@@ -1,4 +1,5 @@
-from shared.date_time_range import DateTimeRange
+from datetime import date
+
 from analysis_settings.weather_analysis_sample import WeatherAnalysisSample
 from analysis_settings.weather_analysis_settings import WeatherAnalysisSettings
 from analysis_settings.weather_analysis_settings_subscriber import (
@@ -37,7 +38,7 @@ class WeatherAnalysisSettingsManager:
         location_name_two: str,
         metric: WeatherMetric,
         analysis_type: WeatherAnalysisType,
-        time_range: DateTimeRange,
+        date: date,
     ):
         location_one = self._location_repository.find_location_by_name(
             location_name_one
@@ -51,10 +52,10 @@ class WeatherAnalysisSettingsManager:
             )
 
         sample_one = WeatherAnalysisSample(
-            location=location_one, metric=metric, date_time_range=time_range
+            location=location_one, metric=metric, date=date
         )
         sample_two = WeatherAnalysisSample(
-            location=location_two, metric=metric, date_time_range=time_range
+            location=location_two, metric=metric, date=date
         )
         new_settings = WeatherAnalysisSettings(
             sample_one=sample_one, sample_two=sample_two, analysis_type=analysis_type

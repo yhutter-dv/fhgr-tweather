@@ -2,7 +2,11 @@
 name = "fhgr-tweather"
 version = "0.1"
 description = "Tweather App for SAD Module @FHGR"
-dependencies = []
+dependencies = [
+    "pandas",
+    "pyproj",
+    "openmeteo-requests"
+]
 
 [tool.setuptools]
 py-modules = []

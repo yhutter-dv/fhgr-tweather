@@ -1,12 +1,11 @@
 from dataclasses import dataclass
-from datetime import date
-
+import datetime
 from analysis_settings.weather_location import WeatherLocation
 from analysis_settings.weather_metric import WeatherMetric
 
 
 @dataclass
-class WeatherAnalysisSample:
+class WeatherDataRequest:
     location: WeatherLocation
+    date: datetime.date
     metric: WeatherMetric
-    date: date
