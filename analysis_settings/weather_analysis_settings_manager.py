@@ -16,7 +16,7 @@ class WeatherAnalysisSettingsManager:
         self._subscribers: list[WeatherAnalysisSettingsSubscriber] = []
         self._location_repository = location_repository
 
-    def _notify_subscribers(self):
+    def notify_subscribers(self):
         if self._settings is None:
             return
         for subscriber in self._subscribers:
@@ -46,10 +46,11 @@ class WeatherAnalysisSettingsManager:
         location_two = self._location_repository.find_location_by_name(
             location_name_two
         )
-        if location_one is None or location_two is None:
-            raise Exception(
-                f"Could not find locations for provided names {location_name_one} and {location_name_two}"
-            )
+        if location_one is None:
+            raise Exception(f"Could not find location with name '{location_name_one}'")
+
+        if location_two is None:
+            raise Exception(f"Could not find location with name '{location_name_two}'")
 
         sample_one = WeatherAnalysisSample(
             location=location_one, metric=metric, date=date
@@ -64,4 +65,4 @@ class WeatherAnalysisSettingsManager:
             return
 
         self._settings = new_settings
-        self._notify_subscribers()
+        self.notify_subscribers()

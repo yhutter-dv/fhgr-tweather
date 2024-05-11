@@ -5,10 +5,6 @@ class WeatherLocationRepository:
     def __init__(self):
         self._weather_locations: dict[str, WeatherLocation] = {}
 
-    def load_data_from_file(self, file_path: str) -> dict[str, WeatherLocation]:
-        # TODO: Load data from json file, probably also move this method out of this class and call it externally.
-        pass
-
     def remove_location(self, location: WeatherLocation) -> None:
         key = location.name
         del self._weather_locations[key]
