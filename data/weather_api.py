@@ -21,7 +21,7 @@ class WeatherApi:
         self._client = Client()
 
     def create_df_from_variables_with_time(
-        self, variables: VariablesWithTime, metric_key: str
+        self, variables: VariablesWithTime, metric_key: str, has_hourly=True
     ) -> pd.DataFrame:
 
         data: dict = {
@@ -38,7 +38,7 @@ class WeatherApi:
         if variable is None:
             raise Exception("Could not get first variable")
 
-        data[metric_key] = variable.ValuesAsNumpy()
+        data[metric_key] = variable.ValuesAsNumpy() if has_hourly else variable.Value()
 
         df = pd.DataFrame(data)
         df.dropna(inplace=True)
@@ -124,7 +124,9 @@ class WeatherApi:
         if current is None:
             raise Exception("No current data received for request make_current_request")
 
-        df = self.create_df_from_variables_with_time(current, metric_key=metric_key)
+        df = self.create_df_from_variables_with_time(
+            current, metric_key=metric_key, has_hourly=False
+        )
 
         # Return last value
         return df[metric_key].iloc[-1]

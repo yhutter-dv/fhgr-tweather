@@ -93,12 +93,12 @@ class TestWeatherAnalysisSettingsManager(
         if self._settings is None:
             self.fail("Expected settings to be defined")
 
-        sample_one = self._settings.sample_one
-        sample_two = self._settings.sample_two
-        self.assertEqual("Chur", sample_one.location.name)
-        self.assertEqual(WeatherMetric.RAIN, sample_one.metric)
-        self.assertEqual("Chur", sample_two.location.name)
-        self.assertEqual(WeatherMetric.RAIN, sample_two.metric)
+        config_one = self._settings.configs[0]
+        config_two = self._settings.configs[1]
+        self.assertEqual("Chur", config_one.location.name)
+        self.assertEqual(WeatherMetric.RAIN, config_one.metric)
+        self.assertEqual("Chur", config_two.location.name)
+        self.assertEqual(WeatherMetric.RAIN, config_two.metric)
         self.assertEqual(WeatherAnalysisType.TEXT, self._settings.analysis_type)
 
 

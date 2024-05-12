@@ -6,7 +6,7 @@ from analysis_settings.weather_metric import WeatherMetric
 
 
 @dataclass
-class WeatherAnalysisSample:
+class WeatherAnalysisConfig:
     location: WeatherLocation
     metric: WeatherMetric
     date: date
