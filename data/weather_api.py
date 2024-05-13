@@ -42,7 +42,7 @@ class WeatherApi:
         df.dropna(inplace=True)
         return df
 
-    def _make_historical_request(
+    def _get_historical_value(
         self, request: WeatherDataRequest, metric_key: str
     ) -> float:
         date_str = f"{request.date}"
@@ -76,7 +76,7 @@ class WeatherApi:
 
         return values_for_date[metric_key].iloc[-1]
 
-    def _make_forecast_request(
+    def _get_forecast_value(
         self, request: WeatherDataRequest, metric_key: str
     ) -> float:
         params = {
@@ -106,7 +106,7 @@ class WeatherApi:
 
         return values_for_date[metric_key].iloc[-1]
 
-    def _make_current_request(
+    def _get_current_value(
         self, request: WeatherDataRequest, metric_key: str
     ) -> float:
         params = {
@@ -156,15 +156,15 @@ class WeatherApi:
 
             # Current
             if request.date == today:
-                value = self._make_current_request(request, metric_key=metric_key)
+                value = self._get_current_value(request, metric_key=metric_key)
 
             # Forecast
             elif request.date > today:
                 self._ensure_forecast_date(request.date)
-                value = self._make_forecast_request(request, metric_key=metric_key)
+                value = self._get_forecast_value(request, metric_key=metric_key)
             # Historical
             else:
-                value = self._make_historical_request(request, metric_key=metric_key)
+                value = self._get_historical_value(request, metric_key=metric_key)
 
             response = WeatherDataResponse(
                 location=request.location,
@@ -179,7 +179,7 @@ class WeatherApi:
                 location=request.location,
                 metric=request.metric,
                 date=request.date,
-                value=None,
+                value=0.0,
                 has_error=True,
                 error_reason=f"{ex}",
             )

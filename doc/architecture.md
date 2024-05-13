@@ -20,10 +20,10 @@ classDiagram
     AnalysisSettingsManager *-- WeatherAnalysisSettings
     AnalysisSettingsManager *-- WeatherLocationRepository
     AnalysisSettingsManager .. AnalysisSettingsSubscriber
-    WeatherAnalysisSettings *-- WeatherAnalysisSample
     WeatherAnalysisSettings *-- WeatherAnalysisType
-    WeatherAnalysisSample *-- WeatherMetric
-    WeatherAnalysisSample *-- WeatherLocation
+    WeatherAnalysisSettings *-- WeatherAnalysisConfig
+    WeatherAnalysisConfig *-- WeatherMetric
+    WeatherAnalysisConfig *-- WeatherLocation
 
     class AnalysisSettingsSubscriber {
         <<interface>>
@@ -44,47 +44,47 @@ classDiagram
     }
 
     class WeatherLocationRepository {
-        - WeatherLocation[] _locations
-        + WeatherLocation[] locations()
-        + WeatherLocation[] find_locations(String location_name_pattern)
-        + WeatherLocation get_location(String location_name)
+        - WeatherLocation[] _weather_locations
+        + remove_location(WeatherLocation location)
+        + add_location(WeatherLocation location)
+        + clear_locations()
+        + WeatherLocation[] find_locations_by_name(String location_name)
+        + WeatherLocation find_location_by_name(String location_name)
     }
 
     note for AnalysisSettingsManager "Root Aggregate"
     class AnalysisSettingsManager {
         - WeatherAnalysisSettings _settings
-        - WeatherLocationRepository _weather_location_repository
         - AnalysisSettingsSubscriber[] _subscribers
-        + bool update_settings(String location_name_one, String location_name_two, WeatherMetric metric, WeatherAnalysisType analysis_type, DateTime time_range)
-        + publish_settings()
+        - WeatherLocationRepository _weather_location_repository
+        - notify_subscribers()
         + subscribe(AnalysisSettingsSubscriber subscriber)
         + unsubscribe(AnalysisSettingsSubscriber subscriber)
+        + update_settings(String location_name_one, String location_name_two, WeatherMetric metric, WeatherAnalysisType analysis_type, Date date)
     }
 
     class WeatherAnalysisSettings {
-        - WeatherAnalysisSample _sample_one
-        - WeatherAnalysisSample _sample_two
+        - WeatherAnalysisConfig[] _configs
         - WeatherAnalysisType _analysis_type
-        + WeatherAnalysisSample sample_one()
-        + WeatherAnalysisSample sample_two()
+        + WeatherAnalysisConfig[] configs
         + WeatherAnalysisType analysis_type()
     }
 
-    class WeatherAnalysisSample {
+    class WeatherAnalysisConfig {
         - WeatherLocation _location
         - WeatherMetric _metric
-        - DateTime _time_range
+        - Date _date
         + WeatherLocation location()
         + WeatherMetric metric()
-        + DateTime time_range()
+        + Date date()
     }
 
     class WeatherLocation {
-        - String _location
+        - String _name
         - int _postal_code
         - float _longitude
         - float _latitude
-        + String location()
+        + String name()
         + int postal_code()
         + float longitude()
         + float latitude()
@@ -99,6 +99,7 @@ classDiagram
 
     WeatherAnalyzer *-- WeatherApi
     WeatherAnalyzer *-- WeatherAnalysisResult
+    WeatherAnalysisResult *-- WeatherAnalysisSample
     WeatherChartAnalysisResult --|> WeatherAnalysisResult
     WeatherTextAnalysisResult --|> WeatherAnalysisResult
 
@@ -110,24 +111,34 @@ classDiagram
     note for WeatherAnalyzer "Root Aggregate"
     class WeatherAnalyzer {
         - WeatherApi _weather_api
-        + WeatherChartAnalysisResult analyize_as_chart(WeatherAnalysisSettings settings)
-        + WeatherTextAnalysisResult analyize_as_text(WeatherAnalysisSettings settings)
+        + WeatherAnalysisResult analyze(WeatherAnalysisSettings settings)
     }
 
     class WeatherAnalysisResult {
-        - WeatherDataResponse _data_one
-        - WeatherDataResponse _data_two
-        + WeatherDataResponse data_one()
-        + WeatherDataResponse data_two()
-    }
-
-    class WeatherChartAnalysisResult {
+        - WeatherAnalysisSample[] _samples
+        - WeatherMetric _metric
         - String _title
         - String _x_axis_label
         - String _y_axis_label
+        - String _construct_title()
         + String title()
+        + WeatherAnalysisSample[] samples
         + String x_axis_label()
         + String y_axis_label()
+    }
+
+    class WeatherAnalysisSample {
+        - String _location_name
+        - Date _date
+        - WeatherMetric _metric
+        - float _value
+        + String location_name()
+        + Date date()
+        + float value()
+    }
+
+    class WeatherChartAnalysisResult {
+        
     }
 
     class WeatherTextAnalysisResult {
@@ -145,40 +156,37 @@ classDiagram
 
     WeatherApi *-- WeatherDataRequest
     WeatherApi *-- WeatherDataResponse
-    WeatherDataResponse *-- WeatherData
 
     note for WeatherApi "Root Aggregate"
     class WeatherApi {
-        - WeatherDataRequest _request
-        - WeatherDataResponse _response
+        - float _get_historical_value(WeatherDataRequest request)
+        - float _get_current_value(WeatherDataRequest request)
+        - float _get_forecast_value(WeatherDataRequest request)
         + WeatherDataResponse make_request(WeatherDataRequest request) 
     }
 
     class WeatherDataRequest {
         - WeatherLocation _location
-        - DateTime _time_range
+        - Date _date
         - WeatherMetric _metric
         + WeatherLocation location()
-        + DateTime time_range()
+        + Date date()
         + WeatherMetric metric()
     }
 
     class WeatherDataResponse {
         - WeatherLocation _location
-        - DateTime _time_range
+        - Date _date
+        - float _value
         - WeatherMetric _metric
-        - WeatherData _data
+        - bool _has_error
+        - String _error_reason
         + WeatherLocation location()
-        + DateTime time_range()
+        + Date date()
         + WeatherMetric metric()
-        + WeatherData data()
-    }
-
-    class WeatherData {
-        - float[] _values
-        - DateTime[] _dates
-        + float[] values()
-        + DateTime[] dates
+        + float value()
+        + bool has_error()
+        + String error_reason()
     }
 ```
 
@@ -188,49 +196,55 @@ title: Dashboard Context
 ---
 classDiagram
 
-    WeatherDashboard --|> AnalysisSettingsSubscriber
-    WeatherDashboard *-- AnalysisSettingsManager
+    WeatherDashboard --|> WeatherAnalysisSettingsSubscriber
+    WeatherDashboard *-- WeatherAnalysisSettingsManager
     WeatherDashboard *-- WeatherTextWidget
     WeatherDashboard *-- WeatherChartWidget
+    WeatherChartWidget *-- WeatherChartData
 
-    note for AnalysisSettingsManager "Comes from the AnalysisSettings Context"
-    class AnalysisSettingsManager {
+    note for WeatherAnalysisSettingsManager "Comes from the AnalysisSettings Context"
+    class WeatherAnalysisSettingsManager {
 
     }
 
-    note for AnalysisSettingsSubscriber "Comes from the AnalysisSettings Context"
-    class AnalysisSettingsSubscriber {
+    note for WeatherAnalysisSettingsSubscriber "Comes from the AnalysisSettings Context"
+    class WeatherAnalysisSettingsSubscriber {
 
     }
 
     note for WeatherDashboard "Root Aggregate"
     class WeatherDashboard {
         - WeatherAnalyzer _weather_analyzer
-        - AnalysisSettingsManager _settings_manager
+        - WeatherAnalysisSettingsManager _settings_manager
+        - WeatherAnalysisSettings _current_settings
         - WeatherTextWidget _text_widget
         - WeatherChartWidget _chart_widget
         - WeatherAnalysisSettings _settings
+        - clear_widgets()
         + on_settings_changed(WeatherAnalysisSettings settings)
-        + WeatherTextWidget text_widget()
-        + WeatherChartWidget chart_widget()
+        + reload()
         + String generate_share_link()
-        + WeatherDashboard create_from_share_link(String share_link)
     }
 
     class WeatherTextWidget {
         - String _title
-        - WeatherTextAnalysisResult _content
+        - String _text
         + String title()
-        + WeatherTextAnalysisResult content()
+        + String text()
     }
 
 
     class WeatherChartWidget {
         - String _title
-        - WeatherChartAnalysisResult _content
+        - WeatherChartData _data
         + String title()
-        + WeatherChartAnalysisResult content()
+        + WeatherChartData data()
         + bool save_as_image(String path)
+    }
+
+    class WeatherChartData {
+        - Tuple<Date, float>[] _data
+        + Tuple<Date, float>[] data()
     }
 ```
 

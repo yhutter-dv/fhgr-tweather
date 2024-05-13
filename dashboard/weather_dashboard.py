@@ -24,6 +24,10 @@ class WeatherDashboard(WeatherAnalysisSettingsSubscriber):
 
         self._analysis_settings_manager.subscribe(self)
 
+
+    def __repr__(self) -> str:
+        return f"WeatherDashboard(chart_widget: {self._chart_widget}, text_widget: {self._text_widget})"
+
     def _clear_widgets(self):
         self._chart_widget = None
         self._text_widget = None
@@ -49,5 +53,8 @@ class WeatherDashboard(WeatherAnalysisSettingsSubscriber):
         else:
             raise Exception(f"Got unexpected Analysis Type {type(analyse_result)}")
 
-    def __repr__(self) -> str:
-        return f"WeatherDashboard(chart_widget: {self._chart_widget}, text_widget: {self._text_widget})"
+    def generate_share_link(self) -> str:
+        # TODO: Here we probably want to construct some sort of URL.
+        return ""
+
+        
