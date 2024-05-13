@@ -20,7 +20,7 @@ class WeatherAnalysisSettingsManager:
             else WeatherLocationRepository()
         )
 
-    def notify_subscribers(self):
+    def _notify_subscribers(self):
         if self._settings is None:
             return
         for subscriber in self._subscribers:
@@ -67,4 +67,4 @@ class WeatherAnalysisSettingsManager:
             return
 
         self._settings = new_settings
-        self.notify_subscribers()
+        self._notify_subscribers()
