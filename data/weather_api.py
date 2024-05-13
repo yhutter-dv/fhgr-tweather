@@ -10,7 +10,6 @@ from data.weather_data_response import WeatherDataResponse
 
 
 class WeatherApi:
-
     FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
     HISTORICAL_URL = "https://archive-api.open-meteo.com/v1/era5"
 
@@ -20,10 +19,9 @@ class WeatherApi:
     def __init__(self):
         self._client = Client()
 
-    def create_df_from_variables_with_time(
+    def _create_df_from_variables_with_time(
         self, variables: VariablesWithTime, metric_key: str, has_hourly=True
     ) -> pd.DataFrame:
-
         data: dict = {
             "date_time": pd.date_range(
                 start=pd.to_datetime(variables.Time(), unit="s"),
@@ -44,7 +42,7 @@ class WeatherApi:
         df.dropna(inplace=True)
         return df
 
-    def make_historical_request(
+    def _get_historical_value(
         self, request: WeatherDataRequest, metric_key: str
     ) -> float:
         date_str = f"{request.date}"
@@ -65,7 +63,7 @@ class WeatherApi:
                 "No hourly data received for request make_historical_request"
             )
 
-        df = self.create_df_from_variables_with_time(hourly, metric_key=metric_key)
+        df = self._create_df_from_variables_with_time(hourly, metric_key=metric_key)
 
         # Filter out the data which matches the date and return the latest one
         values_for_date = df[df["date_time"].dt.date == request.date]
@@ -78,7 +76,7 @@ class WeatherApi:
 
         return values_for_date[metric_key].iloc[-1]
 
-    def make_forecast_request(
+    def _get_forecast_value(
         self, request: WeatherDataRequest, metric_key: str
     ) -> float:
         params = {
@@ -95,7 +93,7 @@ class WeatherApi:
         if hourly is None:
             raise Exception("No hourly data received for request make_forecast_request")
 
-        df = self.create_df_from_variables_with_time(hourly, metric_key=metric_key)
+        df = self._create_df_from_variables_with_time(hourly, metric_key=metric_key)
 
         # Filter out the data which matches the date and return the latest one
         values_for_date = df[df["date_time"].dt.date == request.date]
@@ -108,7 +106,7 @@ class WeatherApi:
 
         return values_for_date[metric_key].iloc[-1]
 
-    def make_current_request(
+    def _get_current_value(
         self, request: WeatherDataRequest, metric_key: str
     ) -> float:
         params = {
@@ -124,14 +122,14 @@ class WeatherApi:
         if current is None:
             raise Exception("No current data received for request make_current_request")
 
-        df = self.create_df_from_variables_with_time(
+        df = self._create_df_from_variables_with_time(
             current, metric_key=metric_key, has_hourly=False
         )
 
         # Return last value
         return df[metric_key].iloc[-1]
 
-    def generate_metric_key(
+    def _generate_metric_key(
         self, metric: WeatherMetric, altitude_in_meters: int
     ) -> str:
         # TODO: Currently the only metric which supports altitude is TEMPERATURE
@@ -141,7 +139,7 @@ class WeatherApi:
             case _:
                 return f"{metric}"
 
-    def ensure_forecast_date(self, forecast_date: date):
+    def _ensure_forecast_date(self, forecast_date: date):
         today = date.today()
         max_forecast_date = today + timedelta(days=self.MAX_FORECAST_DAYS)
         if forecast_date > max_forecast_date:
@@ -151,22 +149,22 @@ class WeatherApi:
 
     def make_request(self, request: WeatherDataRequest) -> WeatherDataResponse:
         try:
-            metric_key = self.generate_metric_key(request.metric, altitude_in_meters=2)
+            metric_key = self._generate_metric_key(request.metric, altitude_in_meters=2)
 
             today = date.today()
             value = None
 
             # Current
             if request.date == today:
-                value = self.make_current_request(request, metric_key=metric_key)
+                value = self._get_current_value(request, metric_key=metric_key)
 
             # Forecast
             elif request.date > today:
-                self.ensure_forecast_date(request.date)
-                value = self.make_forecast_request(request, metric_key=metric_key)
+                self._ensure_forecast_date(request.date)
+                value = self._get_forecast_value(request, metric_key=metric_key)
             # Historical
             else:
-                value = self.make_historical_request(request, metric_key=metric_key)
+                value = self._get_historical_value(request, metric_key=metric_key)
 
             response = WeatherDataResponse(
                 location=request.location,
@@ -181,7 +179,7 @@ class WeatherApi:
                 location=request.location,
                 metric=request.metric,
                 date=request.date,
-                value=None,
+                value=0.0,
                 has_error=True,
                 error_reason=f"{ex}",
             )

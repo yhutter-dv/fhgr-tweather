@@ -11,12 +11,16 @@ from analysis_settings.weather_metric import WeatherMetric
 
 
 class WeatherAnalysisSettingsManager:
-    def __init__(self, location_repository: WeatherLocationRepository):
+    def __init__(self, location_repository: WeatherLocationRepository | None = None):
         self._settings: WeatherAnalysisSettings | None = None
         self._subscribers: list[WeatherAnalysisSettingsSubscriber] = []
-        self._location_repository = location_repository
+        self._location_repository = (
+            location_repository
+            if location_repository is not None
+            else WeatherLocationRepository()
+        )
 
-    def notify_subscribers(self):
+    def _notify_subscribers(self):
         if self._settings is None:
             return
         for subscriber in self._subscribers:
@@ -63,4 +67,4 @@ class WeatherAnalysisSettingsManager:
             return
 
         self._settings = new_settings
-        self.notify_subscribers()
+        self._notify_subscribers()

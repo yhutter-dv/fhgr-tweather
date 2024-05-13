@@ -1,3 +1,4 @@
+from analyze.weather_analysis_result import WeatherAnalysisResult
 from analyze.weather_analysis_sample import WeatherAnalysisSample
 from analyze.weather_chart_analysis_result import WeatherChartAnalysisResult
 from analyze.weather_text_analysis_result import WeatherTextAnalysisResult
@@ -10,13 +11,12 @@ from data.weather_data_request import WeatherDataRequest
 
 
 class WeatherAnalyzer:
-
-    def __init__(self, weather_api: WeatherApi) -> None:
-        self._weather_api = weather_api
+    def __init__(self, weather_api: WeatherApi | None = None) -> None:
+        self._weather_api = weather_api if weather_api is not None else WeatherApi()
 
     def analyze(
         self, settings: WeatherAnalysisSettings
-    ) -> WeatherChartAnalysisResult | WeatherTextAnalysisResult:
+    ) -> WeatherAnalysisResult:
         num_configs = len(settings.configs)
         # Ensure that we have exactly to configurations, e.g. one per location we want to analyze
         if num_configs != 2:

@@ -9,6 +9,18 @@ The script can be found under `scripts/preprocess_city_names.py` and does the fo
 - Converts LV95 Coordinates into Latitude and Longitude Coordinates
 - Extracts city name as well as postal code
 
+## Architecture
+The Application is split up into multiple packages:
+
+|Context|Description|
+|--|----|
+|Analysis Settings Context|This context holds all objects related to settings needed for an Analysis|
+|Analyze Context|This context holds all objects responsible for actually doing the analysis|
+|Data Context|This context holds all objects responsible for retrieving and caching the actual data|
+|Dashboard Context|This context holds all objects responsible for displaying the actual dashboard|
+
+For more information see the `doc/architecture.md`. The main Context and therefore entry point of the Application is the `Dashboard Context`.
+
 ## Setup
 First of all create a `virtual environment`:
 
@@ -25,11 +37,14 @@ pip3 install .
 ```
 
 ## Packages
-The Application is split up into multiple packages. The packages are based on the defined Aggregates (see `doc/architecture.md` file). The main package and therefore entry point of the Application is the `dashboard` package.
+
 In order to get a feel at how to use the different packages a corresponding `__main__.py` file was created. In order to run it for a corresponding package run the following command:
 
 ```bash
 python3 -m data # Runs the __main__.py file for the data package
+python3 -m analysis_settings # Runs the __main__.py file for the analysis_settings package
+python3 -m analyze # Runs the __main__.py file for the analyze package
+python3 -m dashboard # Runs the __main__.py file for the dashboard package
 ```
 
 ## Tests
