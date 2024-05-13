@@ -10,9 +10,8 @@ from data.weather_data_request import WeatherDataRequest
 
 
 class WeatherAnalyzer:
-
-    def __init__(self, weather_api: WeatherApi) -> None:
-        self._weather_api = weather_api
+    def __init__(self, weather_api: WeatherApi = None) -> None:
+        self._weather_api = weather_api if weather_api != None else WeatherApi()
 
     def analyze(
         self, settings: WeatherAnalysisSettings
