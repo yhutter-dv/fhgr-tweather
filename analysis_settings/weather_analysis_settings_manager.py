@@ -1,6 +1,6 @@
 from datetime import date
 
-from analysis_settings.weather_analysis_sample import WeatherAnalysisSample
+from analysis_settings.weather_analysis_config import WeatherAnalysisConfig
 from analysis_settings.weather_analysis_settings import WeatherAnalysisSettings
 from analysis_settings.weather_analysis_settings_subscriber import (
     WeatherAnalysisSettingsSubscriber,
@@ -52,14 +52,12 @@ class WeatherAnalysisSettingsManager:
         if location_two is None:
             raise Exception(f"Could not find location with name '{location_name_two}'")
 
-        sample_one = WeatherAnalysisSample(
-            location=location_one, metric=metric, date=date
-        )
-        sample_two = WeatherAnalysisSample(
-            location=location_two, metric=metric, date=date
-        )
+        configs = [
+            WeatherAnalysisConfig(location=location_one, metric=metric, date=date),
+            WeatherAnalysisConfig(location=location_two, metric=metric, date=date),
+        ]
         new_settings = WeatherAnalysisSettings(
-            sample_one=sample_one, sample_two=sample_two, analysis_type=analysis_type
+            configs=configs, analysis_type=analysis_type
         )
         if self._settings == new_settings:
             return

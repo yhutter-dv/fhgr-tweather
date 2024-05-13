@@ -10,6 +10,6 @@ class WeatherDataResponse:
     location: WeatherLocation
     date: date
     metric: WeatherMetric
-    value: float | None
+    value: float
     has_error: bool
     error_reason: str
