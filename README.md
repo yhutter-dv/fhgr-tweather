@@ -47,6 +47,18 @@ python3 -m analyze # Runs the __main__.py file for the analyze package
 python3 -m dashboard # Runs the __main__.py file for the dashboard package
 ```
 
+## Fast API
+
+> Please note that this step assumes that you have your Python Virtual Environment activated.
+
+In order to run the Backend (Fast API) simply execute the following command:
+
+```bash
+fastapi dev
+```
+The OpenAPI Page should now be available under the following [URL](http://localhost:8000/docs)
+
+
 ## Tests
 In order to run the tests execute the following command:
 
