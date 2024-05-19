@@ -5,7 +5,8 @@ description = "Tweather App for SAD Module @FHGR"
 dependencies = [
     "pandas",
     "pyproj",
-    "openmeteo-requests"
+    "openmeteo-requests",
+    "fastapi"
 ]
 
 [tool.setuptools]
