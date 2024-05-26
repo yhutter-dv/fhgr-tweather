@@ -1,14 +1,35 @@
 <!doctype html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tweather App</title>
-    <link rel="stylesheet" href="./style.css"/>
-  </head>
-  <body>
-    <h1 class="text-3xl font-bold">Tweather App</h1>
+    <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+    <header class="flex px-4 py-6 bg-white items-center border-b border-slate-200">
+        <div class="inline-flex mr-4 items-center text-slate-950">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="text-sky-600 fill-current size-8">
+                <path fill-rule="evenodd"
+                    d="M4.5 9.75a6 6 0 0 1 11.573-2.226 3.75 3.75 0 0 1 4.133 4.303A4.5 4.5 0 0 1 18 20.25H6.75a5.25 5.25 0 0 1-2.23-10.004 6.072 6.072 0 0 1-.02-.496Z"
+                    clip-rule="evenodd" />
+            </svg>
+            <h1 class="ml-2 font-medium text-xl">Tweather</h1>
+            <p class="ml-2 py-1 px-3 text-slate-500 bg-slate-100 rounded-full text-sm">v. 1.0</p>
+        </div>
+        <ul>
+            <li class="float-left mx-2 text-slate-950 hover:text-slate-950 hover:ease-in hover:duration-300">
+                <a href="#">Analyze</a>
+            </li>
+            <li class="float-left mx-2 text-slate-600 hover:text-slate-950 hover:ease-in hover:duration-300"><a
+                    href="#">Settings</a>
+            </li>
+        </ul>
+    </header>
     <script type="module" src="/main.js"></script>
-  </body>
+</body>
+
 </html>
