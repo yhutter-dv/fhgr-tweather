@@ -33,6 +33,8 @@ class WeatherLocationRepository:
 
     def get_locations(self) -> list[WeatherLocation]:
         return list(self._weather_locations.values())
+    def get_location_names(self) -> list[str]:
+        return list(self._weather_locations.keys())
 
     def clear_locations(self) -> None:
         self._weather_locations = {}
