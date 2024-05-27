@@ -25,8 +25,7 @@ The Application is split up into a `frontend` and `backend`.
 The frontend is a simple HTML Appliation which displays the results coming from the backend. The following Technologies were used for the development of the frontend:
 
 - [Vite](https://vitejs.dev/) - Frontend Tool Kit (Webbundler)
-- [AlpineJs](https://alpinejs.dev/) - Minimal JavaScript Framework mainly used for Components
-- [Tailwind CSS](https://tailwindcss.com/) - CSS Framework for styling
+- [Rose Pine](https://rosepinetheme.com/palette/) - Used Color Scheme
 
 ### Backend
 The backend itself is written with Python and [FastApi](https://fastapi.tiangolo.com/). For the actual weather metrics themselves [Open Meteo](https://open-meteo.com/) was used.

@@ -1,48 +1,48 @@
 // TODO: Fetch Locations via Endpoint
-const locations = ["Chur", "Buchs", "Mels"]
-const locationCardSuffix = 'location-card-element'
-const selectedLocations = []
-const selectLocationInfo = document.getElementById("select-location-info")
-selectLocationInfo.innerHTML = "Please choose exactly two Locations"
+const availableWeatherLocations = ["Chur", "Buchs", "Mels", "St. Gallen", "Zürich"]
+const weatherLocationCardSuffix = 'weather-location-card-element'
+const selectedWeatherLocations = []
+const weatherLocationInfo = document.getElementById("weather-location-info")
+weatherLocationInfo.innerHTML = "Please choose exactly two Locations"
 
-const createLocationCard = (locationName, index) => {
-    const locationCard = `<div data-name="${locationName}" id="${locationCardSuffix}-${index}" class="flex items-center justify-center border border-slate-200 size-40 rounded"><p>${locationName}</p></div>`
-    return locationCard
+const createWeatherLocationCard = (locationName, index) => {
+    const weatherCard = `<div class="weather-location-card" data-name="${locationName}" id="${weatherLocationCardSuffix}-${index}">${locationName}</div>`
+    return weatherCard
 }
 
-// Populate the Cards for each Location
-const locationCardContainer = document.getElementById("location-card-container")
-locations.map((location, index) => locationCardContainer.innerHTML += createLocationCard(location, index))
+const weatherLocationCardsContainer = document.getElementById("weather-location-cards-container")
+availableWeatherLocations.map((location, index) => weatherLocationCardsContainer.innerHTML += createWeatherLocationCard(location, index))
 
 
 // Define Event Handlers for Location Cards
-const onLocationCardClicked = (e) => {
-    const locationCard = e.target
-    const clickedLocationName = locationCard.dataset.name
-    const alreadySelected = selectedLocations.indexOf(clickedLocationName) >= 0
-    if (alreadySelected && selectedLocations.length !== 0) {
-        locationCard.classList.remove("bg-slate-500")
-        selectedLocations.pop(clickedLocationName)
+const onWeatherLocationCardClicked = (e) => {
+    const weatherLocationCard = e.target
+    const weatherLocationName = weatherLocationCard.dataset.name
+    console.log(weatherLocationName)
+    const alreadySelected = selectedWeatherLocations.indexOf(weatherLocationName) >= 0
+    if (alreadySelected && selectedWeatherLocations.length !== 0) {
+        weatherLocationCard.classList.remove("weather-location-card-selected")
+        selectedWeatherLocations.pop(weatherLocationName)
     } else {
-        locationCard.classList.add("bg-slate-500")
-        selectedLocations.push(clickedLocationName)
+        weatherLocationCard.classList.add("weather-location-card-selected")
+        selectedWeatherLocations.push(weatherLocationName)
     }
-    console.log(selectedLocations)
-    const numberOfSelectedLocations = selectedLocations.length
-    if (numberOfSelectedLocations > 2) {
-        selectLocationInfo.classList.add("text-red-500")
-        selectLocationInfo.innerHTML = `You have choosen ${numberOfSelectedLocations} Locations but you have to choose exactly two`
+    console.log(selectedWeatherLocations)
+    const numberOfSelectedWeatherLocations = selectedWeatherLocations.length
+    if (numberOfSelectedWeatherLocations > 2) {
+        weatherLocationInfo.classList.add("error-text")
+        weatherLocationInfo.innerHTML = `You have choosen ${numberOfSelectedWeatherLocations} Locations but you have to choose exactly two`
     } else {
-        selectLocationInfo.classList.remove("text-red-500")
-        selectLocationInfo.innerHTML = `Please choose exactly two Locations`
+        weatherLocationInfo.classList.remove("error-text")
+        weatherLocationInfo.innerHTML = `Please choose exactly two Locations`
     }
 }
 
 
 // Attach Events to the Location Cards
-const locationCardElements = document.querySelectorAll(`[id^="${locationCardSuffix}"]`)
-locationCardElements.forEach(card => {
-    card.addEventListener("click", onLocationCardClicked)
+const weatherLocationCards = document.querySelectorAll(`[id^="${weatherLocationCardSuffix}"]`)
+weatherLocationCards.forEach(card => {
+    card.addEventListener("click", onWeatherLocationCardClicked)
 })
 
 
