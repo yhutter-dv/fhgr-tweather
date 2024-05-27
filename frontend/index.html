@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <header class="flex px-4 py-6 bg-white items-center border-b border-slate-200">
+    <header class="flex px-4 py-6 bg-white items-center border-b border-slate-200 h-18">
         <div class="inline-flex mr-4 items-center text-slate-950">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="text-sky-600 fill-current size-8">
                 <path fill-rule="evenodd"
@@ -20,15 +20,23 @@
             <h1 class="ml-2 font-medium text-xl">Tweather</h1>
             <p class="ml-2 py-1 px-3 text-slate-500 bg-slate-100 rounded-full text-sm">v. 1.0</p>
         </div>
-        <ul>
-            <li class="float-left mx-2 text-slate-950 hover:text-slate-950 hover:ease-in hover:duration-300">
-                <a href="#">Analyze</a>
-            </li>
-            <li class="float-left mx-2 text-slate-600 hover:text-slate-950 hover:ease-in hover:duration-300"><a
-                    href="#">Settings</a>
-            </li>
-        </ul>
     </header>
+
+    <aside class="mt-18 p-4 h-screen border-r border-slate-200 max-w-96">
+        <div class="mb-4">
+            <h2 class="text-md font-bold text-slate-950">Select Location</h2>
+            <p id="select-location-info" class="text-sm py-2 text-slate-500"></p>
+            <input class="w-full my-2 py-2 px-2 text-sm border border-slate-300 rounded-md" type="text"
+                placeholder="Search Locations..." />
+            <div id="location-card-container" class="grid grid-cols-2 gap-4 max-h-96 overflow-y-auto"></div>
+        </div>
+
+    </aside>
+
+    <main>
+
+    </main>
+
     <script type="module" src="/main.js"></script>
 </body>
 
