@@ -41,7 +41,37 @@
 .weather-location-card-selected {
     background-color: var(--light-foam);
     color: var(--light-base);
+}
 
+#weather-metric-cards-container {
+    margin-top: 1.5rem;
+}
+
+.weather-metric-card {
+    padding: 1rem;
+    background-color: var(--light-surface);
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+
+    .title {
+        font-weight: 600;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        font-weight: normal;
+        color: var(--light-muted);
+    }
+}
+
+.weather-metric-card-selected {
+    background-color: var(--light-foam);
+    color: var(--light-base);
+
+    .subtitle {
+        color: var(--light-base);
+    }
 }
 
 body {
