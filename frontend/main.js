@@ -88,7 +88,15 @@ const onWeatherMetricCardClicked = (e) => {
     }
 }
 
-// Attach Events to the Weather Location Cards
+const onAnalyzeButtonClicked = (e) => {
+    console.log("Analyze Button clicked")
+}
+
+const onResetButtonClicked = (e) => {
+    console.log("Reset Button clicked")
+}
+
+// Attach Events to the Weather Location and Metric Cards
 const weatherLocationCards = document.querySelectorAll(`[id^="${weatherLocationCardSuffix}"]`)
 weatherLocationCards.forEach(card => {
     card.addEventListener("click", onWeatherLocationCardClicked)
@@ -99,3 +107,8 @@ weatherMetricCards.forEach(card => {
     card.addEventListener("click", onWeatherMetricCardClicked)
 })
 
+// Attach Events to the Analyze and Reset Button
+const analyzeButton = document.getElementById("analyze-button")
+analyzeButton.addEventListener("click", onAnalyzeButtonClicked)
+const resetButton = document.getElementById("reset-button")
+resetButton.addEventListener("click", onResetButtonClicked)
