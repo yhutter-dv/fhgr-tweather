@@ -5,6 +5,11 @@ const availableWeatherMetrics = [
         "identifier": "temperature",
         "title": "Temperature",
         "subtitle": "Make a comparison based on Temperature in °C"
+    },
+    {
+        "identifier": "rain",
+        "title": "Rain",
+        "subtitle": "Amount of rain"
     }
 ]
 
@@ -21,7 +26,7 @@ const weatherMetricInfo = document.getElementById("weather-metric-info")
 weatherMetricInfo.innerHTML = "Please choose at least one Metric"
 
 const createWeatherLocationCard = (locationName, index) => {
-    const weatherCard = `<div class="weather-location-card" data-name="${locationName}" id="${weatherLocationCardSuffix}-${index}">${locationName}</div>`
+    const weatherCard = `<div class="weather-location-card" data-name="${locationName}" id="${weatherLocationCardSuffix}-${index}"><p>${locationName}</p></div>`
     return weatherCard
 }
 
@@ -41,16 +46,16 @@ availableWeatherMetrics.map((metric, index) => weatherMetricCardsContainer.inner
 
 // Define Event Handlers 
 const onWeatherLocationCardClicked = (e) => {
-    const weatherLocationCard = e.target
-    const weatherLocationName = weatherLocationCard.dataset.name
-    const alreadySelected = selectedWeatherLocations.indexOf(weatherLocationName) >= 0
-    if (alreadySelected && selectedWeatherLocations.length !== 0) {
-        weatherLocationCard.classList.remove("weather-location-card-selected")
-        selectedWeatherLocations.pop(weatherLocationName)
+    const weatherLocationCard = e.currentTarget
+    const weatherLocationName = weatherLocationCard.dataset.name.toString()
+    const index = selectedWeatherLocations.indexOf(weatherLocationName)
+    const alreadySelected = index >= 0 && selectedWeatherLocations.length !== 0
+    if (alreadySelected) {
+        selectedWeatherLocations.splice(index, 1)
     } else {
-        weatherLocationCard.classList.add("weather-location-card-selected")
         selectedWeatherLocations.push(weatherLocationName)
     }
+    weatherLocationCard.classList.toggle("weather-location-card-selected")
     const numberOfSelectedWeatherLocations = selectedWeatherLocations.length
     if (numberOfSelectedWeatherLocations > 2) {
         weatherLocationInfo.classList.add("error-text")
@@ -63,16 +68,16 @@ const onWeatherLocationCardClicked = (e) => {
 
 
 const onWeatherMetricCardClicked = (e) => {
-    const weatherMetricCard = e.target
+    const weatherMetricCard = e.currentTarget
     const weatherMetric = weatherMetricCard.dataset.metric
-    const alreadySelected = selectedWeatherMetrics.indexOf(weatherMetric) >= 0
-    if (alreadySelected && selectedWeatherLocations.length !== 0) {
-        weatherMetricCard.classList.remove("weather-metric-card-selected")
-        selectedWeatherMetrics.pop(weatherMetric)
+    const index = selectedWeatherLocations.indexOf(weatherMetric)
+    const alreadySelected = index >= 0 && selectedWeatherMetrics.length !== 0
+    if (alreadySelected) {
+        selectedWeatherMetrics.splice(index, 1)
     } else {
-        weatherMetricCard.classList.add("weather-metric-card-selected")
         selectedWeatherMetrics.push(weatherMetric)
     }
+    weatherMetricCard.classList.toggle("weather-metric-card-selected")
     const numberOfSelectedWeatherMetrics = selectedWeatherMetrics.length
     if (numberOfSelectedWeatherMetrics < 1) {
         weatherMetricInfo.classList.add("error-text")
