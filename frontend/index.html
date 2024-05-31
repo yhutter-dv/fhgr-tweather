@@ -1,55 +1,122 @@
 <!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Tweather App</title>
+        <link rel="stylesheet" href="./style.css" />
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tweather App</title>
-    <link rel="stylesheet" href="./style.css" />
-</head>
+    <body>
+        <header>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                class="header-logo"
+            >
+                <path
+                    fill-rule="evenodd"
+                    d="M4.5 9.75a6 6 0 0 1 11.573-2.226 3.75 3.75 0 0 1 4.133 4.303A4.5 4.5 0 0 1 18 20.25H6.75a5.25 5.25 0 0 1-2.23-10.004 6.072 6.072 0 0 1-.02-.496Z"
+                    clip-rule="evenodd"
+                />
+            </svg>
+            <h1 class="header-text">Tweather</h1>
+        </header>
 
-<body>
-    <header>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="header-logo">
-            <path fill-rule="evenodd"
-                d="M4.5 9.75a6 6 0 0 1 11.573-2.226 3.75 3.75 0 0 1 4.133 4.303A4.5 4.5 0 0 1 18 20.25H6.75a5.25 5.25 0 0 1-2.23-10.004 6.072 6.072 0 0 1-.02-.496Z"
-                clip-rule="evenodd" />
-        </svg>
-        <h1 class="header-text">Tweather</h1>
-    </header>
+        <aside>
+            <section>
+                <h2 class="title">Select Location</h2>
+                <p id="weather-location-info" class="subtitle"></p>
+                <input
+                    class="weather-locations-search"
+                    type="text"
+                    placeholder="Search for a location..."
+                />
+                <div id="weather-location-cards-container"></div>
+            </section>
+            <section>
+                <h2 class="title">Select Weather Metrics</h2>
+                <p id="weather-metric-info" class="subtitle"></p>
+                <div id="weather-metric-cards-container"></div>
+            </section>
+            <section>
+                <h2 class="title">Pick a Date</h2>
+                <p class="subtitle">Please choose a Date for the Comparison</p>
+                <input id="weather-date" type="date" />
+            </section>
+            <section>
+                <div class="button-container">
+                    <button id="analyze-button" class="primary-button">
+                        Analyze
+                    </button>
+                    <button id="reset-button" class="secondary-button">
+                        Reset
+                    </button>
+                </div>
+            </section>
+        </aside>
 
-    <aside>
-        <section>
-            <h2 class="title">Select Location</h2>
-            <p id="weather-location-info" class="subtitle"></p>
-            <input class="weather-locations-search" type="text" placeholder="Search for a location..." />
-            <div id="weather-location-cards-container">
-            </div>
-        </section>
-        <section>
-            <h2 class="title">Select Weather Metrics</h2>
-            <p id="weather-metric-info" class="subtitle"></p>
-            <div id="weather-metric-cards-container"></div>
-        </section>
-        <section>
-            <h2 class="title">Pick a Date</h2>
-            <p class="subtitle">Please choose a Date for the Comparison</p>
-            <input id="weather-date" type="date" />
-        </section>
-        <section>
-            <div class="button-container">
-                <button id="analyze-button" class="primary-button">Analyze</button>
-                <button id="reset-button" class="secondary-button">Reset</button>
-            </div>
-        </section>
-    </aside>
+        <main>
+            <section>
+                <h1>Temperature</h1>
+                <div class="container-wrapper">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <p>30.03.2024</p>
+                            <div class="chart-download">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    class="chart-download-icon"
+                                >
+                                    <path
+                                        d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z"
+                                    />
+                                    <path
+                                        d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-container">
+                        <p>At 30.03 Chur is 15°C hoter then Buchs</p>
+                    </div>
+                </div>
+            </section>
 
-    <main>
+            <section>
+                <h1>Temperature</h1>
+                <div class="container-wrapper">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <p>30.03.2024</p>
+                            <div class="chart-download">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                    class="chart-download-icon"
+                                >
+                                    <path
+                                        d="M10.75 2.75a.75.75 0 0 0-1.5 0v8.614L6.295 8.235a.75.75 0 1 0-1.09 1.03l4.25 4.5a.75.75 0 0 0 1.09 0l4.25-4.5a.75.75 0 0 0-1.09-1.03l-2.955 3.129V2.75Z"
+                                    />
+                                    <path
+                                        d="M3.5 12.75a.75.75 0 0 0-1.5 0v2.5A2.75 2.75 0 0 0 4.75 18h10.5A2.75 2.75 0 0 0 18 15.25v-2.5a.75.75 0 0 0-1.5 0v2.5c0 .69-.56 1.25-1.25 1.25H4.75c-.69 0-1.25-.56-1.25-1.25v-2.5Z"
+                                    />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-container">
+                        <p>At 30.03 Chur is 15°C hoter then Buchs</p>
+                    </div>
+                </div>
+            </section>
+        </main>
 
-    </main>
-
-    <script type="module" src="/main.js"></script>
-</body>
-
+        <script type="module" src="/main.js"></script>
+    </body>
 </html>
