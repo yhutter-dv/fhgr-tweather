@@ -211,6 +211,7 @@ main {
                     justify-content: space-between;
                     color: var(--light-apple-subtle);
                     font-size: 0.75rem;
+                    margin-bottom: 1rem;
 
                     .chart-download {
                         width: 1rem;
@@ -224,6 +225,10 @@ main {
                             color: var(--light-apple-blue);
                         }
                     }
+                }
+
+                canvas {
+                    height: 150px;
                 }
             }
             .text-container {

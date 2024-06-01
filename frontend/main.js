@@ -1,3 +1,7 @@
+import { Chart, registerables } from "chart.js";
+
+Chart.register(...registerables);
+
 // TODO: Fetch via appropriate Endpoints
 const availableWeatherLocations = [
   "Chur",
@@ -25,11 +29,34 @@ const selectedWeatherMetrics = [];
 const weatherLocationCardSuffix = "weather-location-card-element";
 const weatherMetricCardSuffix = "weather-metric-card-element";
 
+const root = document.querySelector(":root");
+const lightAppleBlueColor =
+  getComputedStyle(root).getPropertyValue("--light-apple-blue");
+const lightAppleYellowColor = getComputedStyle(root).getPropertyValue(
+  "--light-apple-yellow",
+);
+
 const weatherLocationInfo = document.getElementById("weather-location-info");
 weatherLocationInfo.innerHTML = "Please choose exactly two Locations";
 
 const weatherMetricInfo = document.getElementById("weather-metric-info");
 weatherMetricInfo.innerHTML = "Please choose at least one Metric";
+
+const chartContext = document.getElementById("my-chart");
+new Chart(chartContext, {
+  type: "bar",
+  data: {
+    labels: ["Buchs", "Chur"],
+    datasets: [
+      {
+        label: "Temperature in °C",
+        data: [10, 15],
+        backgroundColor: [lightAppleBlueColor, lightAppleYellowColor],
+        borderWidth: 0,
+      },
+    ],
+  },
+});
 
 const createWeatherLocationCard = (locationName, index) => {
   const weatherCard = `<div class="weather-location-card" data-name="${locationName}" id="${weatherLocationCardSuffix}-${index}"><p>${locationName}</p></div>`;
