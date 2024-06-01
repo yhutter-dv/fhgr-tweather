@@ -203,7 +203,7 @@ main {
             flex-direction: row;
 
             .chart-container {
-                background-color: var(--light-apple-surface);
+                background-color: var(--light-surface);
                 margin-right: 1rem;
                 padding: 2rem;
                 border-radius: 5px;
@@ -211,7 +211,7 @@ main {
                 .chart-header {
                     display: flex;
                     justify-content: space-between;
-                    color: var(--light-apple-subtle);
+                    color: var(--light-subtle);
                     font-size: 0.75rem;
                     margin-bottom: 1rem;
 
@@ -220,11 +220,11 @@ main {
                         height: 1rem;
                         padding: 10px;
                         margin-left: 1rem;
-                        border: 1px solid var(--light-apple-blue);
+                        border: 1px solid var(--light-foam);
                         border-radius: 8px;
 
                         .chart-download-icon {
-                            color: var(--light-apple-blue);
+                            color: var(--light-foam);
                         }
                     }
                 }
