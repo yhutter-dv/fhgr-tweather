@@ -1,5 +1,6 @@
 import { Chart, registerables } from "chart.js";
 
+// Needed in order to use the various Chart Types of Chartjs.
 Chart.register(...registerables);
 
 // TODO: Fetch via appropriate Endpoints
@@ -30,11 +31,8 @@ const weatherLocationCardSuffix = "weather-location-card-element";
 const weatherMetricCardSuffix = "weather-metric-card-element";
 
 const root = document.querySelector(":root");
-const lightAppleBlueColor =
-  getComputedStyle(root).getPropertyValue("--light-apple-blue");
-const lightAppleYellowColor = getComputedStyle(root).getPropertyValue(
-  "--light-apple-yellow",
-);
+const lightFoamColor = getComputedStyle(root).getPropertyValue("--light-foam");
+const lightGoldColor = getComputedStyle(root).getPropertyValue("--light-gold");
 
 const weatherLocationInfo = document.getElementById("weather-location-info");
 weatherLocationInfo.innerHTML = "Please choose exactly two Locations";
@@ -49,12 +47,36 @@ new Chart(chartContext, {
     labels: ["Buchs", "Chur"],
     datasets: [
       {
-        label: "Temperature in °C",
+        borderRadius: 5,
+        barPercentage: 0.4,
+        categoryPercentage: 1.0,
         data: [10, 15],
-        backgroundColor: [lightAppleBlueColor, lightAppleYellowColor],
+        backgroundColor: [lightFoamColor, lightGoldColor],
         borderWidth: 0,
       },
     ],
+  },
+  options: {
+    plugins: {
+      legend: false,
+    },
+    indexAxis: "y",
+    scales: {
+      y: {
+        grid: {
+          display: false,
+          drawOnChartArea: false,
+          drawTicks: false,
+        },
+      },
+      x: {
+        grid: {
+          display: false,
+          drawOnChartArea: false,
+          drawTicks: false,
+        },
+      },
+    },
   },
 });
 

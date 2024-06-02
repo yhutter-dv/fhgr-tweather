@@ -1,16 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 
 :root {
-    --light-base: #FAF4ED;
+    --light-base: #faf4ed;
     --light-base-transparent: rgba(250, 244, 237, 0.7);
-    --light-surface: #FFFAF3;
+    --light-surface: #fffaf3;
     --light-text: #575279;
-    --light-foam: #56949F;
-    --light-highlight-high: #CECACD;
-    --light-highlight-low: #F4EDE8;
+    --light-foam: #56949f;
+    --light-highlight-high: #cecacd;
+    --light-highlight-low: #f4ede8;
     --light-subtle: #797593;
-    --light-muted: #9893A5;
-    --light-gold: #EA9D34;
+    --light-muted: #9893a5;
+    --light-gold: #ea9d34;
     --light-love: #b4637a;
     --sidebar-width: 24rem;
     --header-height: 4rem;
@@ -104,12 +104,16 @@ aside {
 
     .weather-location-card {
         display: flex;
-        padding: 2rem;
+        padding: 1.5rem;
         justify-content: center;
         align-items: center;
         background-color: var(--light-surface);
         border-radius: 5px;
         cursor: pointer;
+
+        p {
+            margin: 0;
+        }
     }
 
     .weather-location-card-selected {
@@ -191,6 +195,7 @@ main {
     position: absolute;
     left: calc(var(--sidebar-width) + 2 * 1rem);
     top: 6rem;
+    width: calc(100% - calc(var(--sidebar-width) + 2rem + 4rem));
 
     display: grid;
     padding: 1rem 2rem;
@@ -200,12 +205,13 @@ main {
     section {
         .container-wrapper {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
+            color: var(--light-text);
 
             .chart-container {
                 background-color: var(--light-surface);
-                margin-right: 1rem;
                 padding: 2rem;
+                margin-bottom: 1rem;
                 border-radius: 5px;
 
                 .chart-header {
@@ -216,21 +222,24 @@ main {
                     margin-bottom: 1rem;
 
                     .chart-download {
+                        cursor: pointer;
+                        padding: 10px;
                         width: 1rem;
                         height: 1rem;
-                        padding: 10px;
-                        margin-left: 1rem;
                         border: 1px solid var(--light-foam);
                         border-radius: 8px;
+                        color: var(--light-foam);
+                        transition: all 0.2s ease-in;
+
+                        &:hover {
+                            background-color: var(--light-foam);
+                            color: var(--light-surface);
+                        }
 
                         .chart-download-icon {
-                            color: var(--light-foam);
+                            color: inherit !important;
                         }
                     }
-                }
-
-                canvas {
-                    height: 150px;
                 }
             }
 
@@ -242,7 +251,7 @@ main {
                 font-weight: 600;
                 font-size: 0.75rem;
                 border-radius: 5px;
-                background-color: var(--light-apple-surface);
+                background-color: var(--light-surface);
             }
         }
     }
