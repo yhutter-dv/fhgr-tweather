@@ -4,17 +4,25 @@ import pandas as pd
 from openmeteo_requests import Client
 from openmeteo_sdk.WeatherApiResponse import VariablesWithTime
 
-from analysis_settings.weather_metric import WeatherMetric
+from shared.weather_metric import WeatherMetric
 from data.weather_data_request import WeatherDataRequest
 from data.weather_data_response import WeatherDataResponse
 
 
 class WeatherApi:
+    # TODO: Perhaps move these values inside a config file
     FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
     HISTORICAL_URL = "https://archive-api.open-meteo.com/v1/era5"
 
     # Technically up to 16 days of forecast are possible
     MAX_FORECAST_DAYS = 7
+
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     def __init__(self):
         self._client = Client()

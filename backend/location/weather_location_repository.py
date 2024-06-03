@@ -1,17 +1,23 @@
-from analysis_settings.weather_location import WeatherLocation
+from location.weather_location import WeatherLocation
 import json
 
 
 class WeatherLocationRepository:
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self):
         self._weather_locations: dict[str, WeatherLocation] = {}
+        self.init_locations_from_file("location/cities.json")
 
-    @staticmethod
-    def init_from_file(file_path: str):
+    def init_locations_from_file(self, file_path: str) -> None:
         with open(file_path, "r", encoding="utf-8") as f:
             cities = json.load(f)
 
-        repository = WeatherLocationRepository()
         for city in cities:
             name = city["name"]
             weather_location = WeatherLocation(
@@ -20,8 +26,7 @@ class WeatherLocationRepository:
                 longitude=city["longitude"],
                 latitude=city["latitude"],
             )
-            repository.add_location(weather_location)
-        return repository
+            self.add_location(weather_location)
 
     def remove_location(self, location: WeatherLocation) -> None:
         key = location.name

@@ -1,80 +1,57 @@
 from analyze.weather_analysis_result import WeatherAnalysisResult
-from analyze.weather_analysis_sample import WeatherAnalysisSample
-from analyze.weather_chart_analysis_result import WeatherChartAnalysisResult
-from analyze.weather_text_analysis_result import WeatherTextAnalysisResult
 from data.weather_api import WeatherApi
-from analysis_settings.weather_analysis_settings import (
+from analyze.weather_analysis_settings import (
     WeatherAnalysisSettings,
-    WeatherAnalysisType,
 )
 from data.weather_data_request import WeatherDataRequest
+from location.weather_location import WeatherLocation
+from location.weather_location_repository import WeatherLocationRepository
 
 
 class WeatherAnalyzer:
-    def __init__(self, weather_api: WeatherApi | None = None) -> None:
-        self._weather_api = weather_api if weather_api is not None else WeatherApi()
+    def __init__(self) -> None:
+        self._weather_api = WeatherApi()
+        self._repository = WeatherLocationRepository()
+
+    def _validate_settings(self, settings: WeatherAnalysisSettings) -> None:
+        num_locations = len(settings.locations)
+        num_metrics = len(settings.metrics)
+
+        if settings.date is None:
+            raise Exception(f"Expected to have a valid date but got '{settings.date}'")
+
+        if num_locations != 2:
+            raise Exception(
+                f"Expected to have exactly two locations but got {num_locations}"
+            )
+
+        if num_metrics < 1:
+            raise Exception(f"Expected to have at least one metric but got none")
 
     def analyze(
         self, settings: WeatherAnalysisSettings
-    ) -> WeatherAnalysisResult:
-        num_configs = len(settings.configs)
-        # Ensure that we have exactly to configurations, e.g. one per location we want to analyze
-        if num_configs != 2:
-            raise Exception(
-                f"Expected to have exactly two configurations but got {num_configs}"
-            )
+    ) -> list[WeatherAnalysisResult]:
+        self._validate_settings(settings)
 
-        # Ensure that they both have the same metric
-        if settings.configs[0].metric is not settings.configs[1].metric:
-            raise Exception(
-                f"Expected to have identical metrics but metrics were {settings.configs[0].metric} and {settings.configs[1].metric}"
-            )
+        location_name_one = settings.locations[0]
+        location_name_two = settings.locations[1]
+        location_one = self._repository.find_location_by_name(location_name_one)
+        location_two = self._repository.find_location_by_name(location_name_two)
 
-        location_one = settings.configs[0].location
-        location_two = settings.configs[1].location
-        request_for_location_one = WeatherDataRequest(
-            location=location_one,
-            date=settings.configs[0].date,
-            metric=settings.configs[0].metric,
-        )
-        response_for_location_one = self._weather_api.make_request(
-            request=request_for_location_one
-        )
+        if location_one is None:
+            raise Exception(f"Could not find a location with the name '{location_name_one}'")
+        elif location_two is None:
+            raise Exception(f"Could not find a location with the name '{location_name_two}'")
 
-        if response_for_location_one.has_error:
-            raise Exception(
-                f"Response for location {location_one} failed due to {response_for_location_one.error_reason}"
-            )
+        analysis_results = []
 
-        sample_one = WeatherAnalysisSample(
-            location_name=response_for_location_one.location.name,
-            date=response_for_location_one.date,
-            metric=response_for_location_one.metric,
-            value=response_for_location_one.value,
-        )
+        for metric in settings.metrics:
+            # TODO: Optimize this so that we can pass a list of metrics instead of iterating over it...
+            request_location_one = WeatherDataRequest(location=location_one, date=settings.date, metric=metric)
+            request_location_two = WeatherDataRequest(location=location_two, date=settings.date, metric=metric)
+            response_location_one = self._weather_api.make_request(request_location_one)
+            response_location_two = self._weather_api.make_request(request_location_two)
+            analysis_result = WeatherAnalysisResult(metric=metric, result=[response_location_one, response_location_two])
+            analysis_results.append(analysis_result)
 
-        request_for_location_two = WeatherDataRequest(
-            location=location_two,
-            date=settings.configs[1].date,
-            metric=settings.configs[1].metric,
-        )
-        response_for_location_two = self._weather_api.make_request(
-            request=request_for_location_two
-        )
-        if response_for_location_two.has_error:
-            raise Exception(
-                f"Response for location {location_one} failed due to {response_for_location_two.error_reason}"
-            )
-
-        sample_two = WeatherAnalysisSample(
-            location_name=response_for_location_two.location.name,
-            date=response_for_location_two.date,
-            metric=response_for_location_two.metric,
-            value=response_for_location_two.value,
-        )
-
-        match settings.analysis_type:
-            case WeatherAnalysisType.CHART:
-                return WeatherChartAnalysisResult(samples=[sample_one, sample_two])
-            case WeatherAnalysisType.TEXT:
-                return WeatherTextAnalysisResult(samples=[sample_one, sample_two])
+        return analysis_results
