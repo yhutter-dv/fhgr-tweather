@@ -37,6 +37,8 @@ export default class SidebarComponent extends HTMLElement {
     this._validateWeatherMetrics();
     this._validateWeatherLocations();
     this._validateWeatherDate();
+
+    this._fetchWeatherLocations();
   }
 
   get _settingsValid() {
@@ -47,18 +49,49 @@ export default class SidebarComponent extends HTMLElement {
     );
   }
 
+  async _fetchWeatherLocations() {
+    const API_BASE_URL = import.meta.env.VITE_API_URL;
+    const url = `${API_BASE_URL}/weather_locations`;
+    const response = await fetch(url);
+    const locations = await response.json();
+    this._availableWeatherLocations = locations;
+    this._weatherLocationCards = this._availableWeatherLocations.map(
+      (x) => new WeatherLocationCardComponent(x),
+    );
+    this._weatherLocationCards.forEach((x) => {
+      x.addEventListener("click", () => this._onWeatherLocationCardClicked(x));
+      this._weatherLocationCardsContainer.appendChild(x);
+    });
+  }
+
   _updateAnalyzeButtonState() {
     if (!this._settingsValid) {
-      console.log("Button is not valid");
       this._analyzeButton.classList.add("analyze-button-invalid");
     } else {
-      console.log("Button is valid");
       this._analyzeButton.classList.remove("analyze-button-invalid");
     }
   }
 
+  _onWeatherLocationSearchButtonClicked() {
+    const search = this._weatherLocationSearch.value.trim();
+
+    // Show or hide depending if the name matches the searched text
+    this._weatherLocationCards.forEach((x) => {
+      if (x.name.toLowerCase().includes(search.toLowerCase())) {
+        x.show();
+      } else {
+        x.hide();
+      }
+    });
+  }
+
   _initElements() {
     // Get necessary references to HTML Elements
+    this._weatherLocationSearch = this._shadow.querySelector("[data-search]");
+    this._weatherLocationSearchButton = this._shadow.querySelector(
+      "#weather-location-search-button",
+    );
+
     this._weatherLocationCardsContainer = this._shadow.querySelector(
       "#weather-location-cards-container",
     );
@@ -79,14 +112,9 @@ export default class SidebarComponent extends HTMLElement {
 
     this._weatherDate = this._shadow.querySelector("#weather-date");
 
-    this._weatherLocationCards = this._availableWeatherLocations.map(
-      (x) => new WeatherLocationCardComponent(x),
+    this._weatherLocationSearchButton.addEventListener("click", () =>
+      this._onWeatherLocationSearchButtonClicked(),
     );
-
-    this._weatherLocationCards.forEach((x) => {
-      x.addEventListener("click", () => this._onWeatherLocationCardClicked(x));
-      this._weatherLocationCardsContainer.appendChild(x);
-    });
 
     this._weatherMetricCards = this._availableWeatherMetrics.map(
       (x) => new WeatherMetricCardComponent(x.metric, x.title, x.description),
@@ -125,7 +153,6 @@ export default class SidebarComponent extends HTMLElement {
       this._selectedWeatherMetrics,
       this._selectedDate,
     );
-    console.log(this._subscribers);
     this._subscribers.forEach((s) => s.onSettingsChanged(settings));
   }
 
@@ -212,19 +239,35 @@ export default class SidebarComponent extends HTMLElement {
               }
           }
 
-          .weather-locations-search {
-              background-color: var(--light-surface);
-              border: 1px solid var(--light-highlight-high);
-              padding: 0.5rem;
-              width: calc(100% - 1rem);
-              font-size: 0.75rem;
-              color: var(--light-muted);
-              border-radius: 5px;
+          .weather-location-search-container {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                align-items: center;
+                .weather-location-search {
+                    background-color: var(--light-surface);
+                    border: 1px solid var(--light-highlight-high);
+                    padding: 0.5rem;
+                    width: calc(100% - 1rem);
+                    font-size: 0.75rem;
+                    color: var(--light-muted);
+                    border-radius: 5px;
 
-              &:focus {
-                  outline: none !important;
-                  border: 1px solid var(--light-foam);
-              }
+                    &:focus {
+                        outline: none !important;
+                        border: 1px solid var(--light-foam);
+                    }
+                }
+
+                #weather-location-search-button {
+                    background-color: var(--light-surface);
+                    margin-left: 1.5rem;
+                    padding: 0.75rem;
+                    border: 1px solid var(--light-highlight-high);
+                    border-radius: 8px;
+                    color: var(--light-text);
+                    cursor: pointer;
+                }
           }
 
           .error-text {
@@ -236,8 +279,7 @@ export default class SidebarComponent extends HTMLElement {
               display: grid;
               grid-template-columns: 1fr 1fr;
               gap: 1rem;
-              /* TODO: Define Max Height */
-              /* max-height: 15rem; */
+              max-height: 15rem;
               overflow-y: scroll;
           }
 
@@ -298,11 +340,16 @@ export default class SidebarComponent extends HTMLElement {
           <section>
               <h2 class="title">Select Location</h2>
               <p id="weather-location-info" class="subtitle">Please choose exactly two Locations</p>
-              <input
-                  class="weather-locations-search"
-                  type="text"
-                  placeholder="Search for a location..."
-              />
+              <div class="weather-location-search-container">
+                <input
+                    data-search
+                    class="weather-location-search"
+                    type="text"
+                    placeholder="Search for a location..."/>
+                <button id="weather-location-search-button">
+                   Search
+                </button>
+              </div>
               <div id="weather-location-cards-container"></div>
           </section>
           <section>

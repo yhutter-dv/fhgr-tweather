@@ -12,6 +12,14 @@ export default class WeatherLocationCardComponent extends HTMLElement {
     this._container.classList.toggle("weather-location-card-selected");
   }
 
+  hide() {
+    this.style.display = "none";
+  }
+
+  show() {
+    this.style.display = "block";
+  }
+
   get name() {
     return this._locationName;
   }
