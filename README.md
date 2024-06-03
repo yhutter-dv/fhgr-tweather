@@ -1,4 +1,4 @@
-# :sun_behind_small_cloud: FHR Tweather App 
+# :sun_behind_small_cloud: FHR Tweather App
 Tweather makes it easy to compare two different locations in Switzerland depending on your defined metrics. Therefore allowing you to pick out the location which fits your needs the most. The name Tweather itself is a pun on Tinder for Weather Locations. This project was done as part of the SAD (Software Architecture and Design) Module @FHGR.
 
 
@@ -19,13 +19,14 @@ The script can be found under `scripts/preprocess_city_names.py` and does the fo
 - Extracts city name as well as postal code
 
 ## Architecture
-The Application is split up into a `frontend` and `backend`. 
+The Application is split up into a `frontend` and `backend`.
 
 ### Frontend
 The frontend is a simple HTML Appliation which displays the results coming from the backend. The following Technologies were used for the development of the frontend:
 
 - [Vite](https://vitejs.dev/) - Frontend Tool Kit (Webbundler)
 - [Rose Pine](https://rosepinetheme.com/palette/) - Used Color Scheme
+- [ChartJS](https://www.chartjs.org/) - Chart Library
 
 ### Backend
 The backend itself is written with Python and [FastApi](https://fastapi.tiangolo.com/). For the actual weather metrics themselves [Open Meteo](https://open-meteo.com/) was used.
@@ -35,15 +36,16 @@ For more information about the Software Architecture itself see `doc/architectur
 In order to get a feel at how to use the different packages a corresponding `__main__.py` file was created. In order to run it for a corresponding package run the following command:
 
 ```bash
+cd backend
 python3 -m data # Runs the __main__.py file for the data package
-python3 -m analysis_settings # Runs the __main__.py file for the analysis_settings package
+python3 -m location # Runs the __main__.py file for the location
 python3 -m analyze # Runs the __main__.py file for the analyze package
-python3 -m dashboard # Runs the __main__.py file for the dashboard package
 ```
 
 In order to run the tests execute the following command:
 
 ```bash
+cd backend
 python3 -m unittest discover -v
 ```
 
@@ -78,7 +80,7 @@ npm i
 
 > :warning: Please make sure that the Backend is started before the Frontend.
 
-### Backend 
+### Backend
 
 > Please note that this step assumes that you have your Python Virtual Environment activated and are inside the `backend` directory.
 
