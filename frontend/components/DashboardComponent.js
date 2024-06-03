@@ -19,8 +19,32 @@ class DashboardComponent extends HTMLElement {
 
     this._sidebar = this._shadow.querySelector("sidebar-component");
     this._sidebar.subscribe(this);
+  }
 
-    this._container.appendChild(new DashboardWidgetComponent());
+  async _populateDashboardFromSettings(settings) {
+    const API_BASE_URL = import.meta.env.VITE_API_URL;
+    const url = `${API_BASE_URL}/weather_analyze`;
+    const requestParams = {
+      method: "POST",
+      body: JSON.stringify({
+        locations: settings.locations,
+        metrics: settings.metrics,
+        date: settings.date,
+      }),
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+    const response = await fetch(url, requestParams);
+    const analyze_results = await response.json();
+    console.log("Got the following results ", analyze_results);
+    this._container.innerHTML = "";
+    // TODO: Check for errors and notify user if anything wrong has happened...
+    analyze_results.forEach((r) => {
+      this._container.appendChild(
+        new DashboardWidgetComponent(r.metric, r.result),
+      );
+    });
   }
 
   get styleTemplate() {
@@ -50,7 +74,7 @@ class DashboardComponent extends HTMLElement {
   }
 
   onSettingsChanged(settings) {
-    console.log("Settings have changed ", settings);
+    this._populateDashboardFromSettings(settings);
   }
 }
 

@@ -1,8 +1,14 @@
 import { Chart } from "chart.js";
 
 export default class DashboardWidgetComponent extends HTMLElement {
-  constructor() {
+  constructor(metric, results) {
     super();
+    this._metric = metric;
+    this._locationNameOne = results[0].location.name;
+    this._locationNameTwo = results[1].location.name;
+    this._valueOne = results[0].value;
+    this._valueTwo = results[1].value;
+    this._date = new Date(results[0].date);
     this._shadow = this.attachShadow({ mode: "open" });
     this._shadow.append(this.template.content.cloneNode(true));
     this._container = this._shadow.querySelector("[data-container]");
@@ -22,13 +28,13 @@ export default class DashboardWidgetComponent extends HTMLElement {
     this._chart = new Chart(chartContext, {
       type: "bar",
       data: {
-        labels: ["Buchs", "Chur"],
+        labels: [this._locationNameOne, this._locationNameTwo],
         datasets: [
           {
             borderRadius: 5,
             barPercentage: 0.4,
             categoryPercentage: 1.0,
-            data: [10, 15],
+            data: [this._valueOne, this._valueTwo],
             backgroundColor: [foamColor, goldColor],
             borderWidth: 0,
           },
