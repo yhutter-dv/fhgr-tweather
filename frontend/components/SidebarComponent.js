@@ -1,6 +1,11 @@
-class SidebarComponent extends HTMLElement {
+import WeatherMetricCardComponent from "./WeatherMetricCardComponent";
+import WeatherLocationCardComponent from "./WeatherLocationCardComponent";
+import SidebarSettings from "../models/SidebarSettings";
+
+export default class SidebarComponent extends HTMLElement {
   constructor() {
     super();
+    this._subscribers = [];
     // TODO: Fetch fia requests...
     this._availableWeatherLocations = [
       "Chur",
@@ -23,10 +28,36 @@ class SidebarComponent extends HTMLElement {
     ];
     this._selectedWeatherLocations = [];
     this._selectedWeatherMetrics = [];
+    this._selectedDate = null;
 
     this._shadow = this.attachShadow({ mode: "open" });
     this._shadow.append(this.template.content.cloneNode(true));
 
+    this._initElements();
+    this._validateWeatherMetrics();
+    this._validateWeatherLocations();
+    this._validateWeatherDate();
+  }
+
+  get _settingsValid() {
+    return (
+      this._selectedWeatherMetrics.length >= 1 &&
+      this._selectedWeatherLocations.length == 2 &&
+      this._selectedDate != null
+    );
+  }
+
+  _updateAnalyzeButtonState() {
+    if (!this._settingsValid) {
+      console.log("Button is not valid");
+      this._analyzeButton.classList.add("analyze-button-invalid");
+    } else {
+      console.log("Button is valid");
+      this._analyzeButton.classList.remove("analyze-button-invalid");
+    }
+  }
+
+  _initElements() {
     // Get necessary references to HTML Elements
     this._weatherLocationCardsContainer = this._shadow.querySelector(
       "#weather-location-cards-container",
@@ -43,6 +74,10 @@ class SidebarComponent extends HTMLElement {
     this._weatherMetricInfo = this._shadow.querySelector(
       "#weather-metric-info",
     );
+
+    this._weatherDateInfo = this._shadow.querySelector("#weather-date-info");
+
+    this._weatherDate = this._shadow.querySelector("#weather-date");
 
     this._weatherLocationCards = this._availableWeatherLocations.map(
       (x) => new WeatherLocationCardComponent(x),
@@ -61,6 +96,37 @@ class SidebarComponent extends HTMLElement {
       x.addEventListener("click", () => this._onWeatherMetricCardClicked(x));
       this._weatherMetricCardsContainer.appendChild(x);
     });
+
+    this._weatherDate.addEventListener("change", (e) =>
+      this._onWeatherDateChanged(),
+    );
+
+    this._analyzeButton = this._shadow.querySelector("#analyze-button");
+    this._analyzeButton.addEventListener("click", () =>
+      this._onAnalyzeButtonClicked(),
+    );
+  }
+
+  _onWeatherDateChanged() {
+    this._selectedDate = this._weatherDate.value;
+    this._validateWeatherDate();
+  }
+
+  _onAnalyzeButtonClicked() {
+    if (!this._settingsValid) {
+      return;
+    }
+    this._notifySettingsChanged();
+  }
+
+  _notifySettingsChanged() {
+    const settings = new SidebarSettings(
+      this._selectedWeatherLocations,
+      this._selectedWeatherMetrics,
+      this._selectedDate,
+    );
+    console.log(this._subscribers);
+    this._subscribers.forEach((s) => s.onSettingsChanged(settings));
   }
 
   _onWeatherLocationCardClicked(card) {
@@ -90,26 +156,32 @@ class SidebarComponent extends HTMLElement {
   }
 
   _validateWeatherLocations() {
+    this._updateAnalyzeButtonState();
     const numberOfSelectedWeatherLocations =
       this._selectedWeatherLocations.length;
-    if (numberOfSelectedWeatherLocations > 2) {
-      this._weatherLocationInfo.classList.add("error-text");
-      this._weatherLocationInfo.innerHTML = `You have choosen ${numberOfSelectedWeatherLocations} Locations but you have to choose exactly two`;
-    } else {
+    if (numberOfSelectedWeatherLocations == 2) {
       this._weatherLocationInfo.classList.remove("error-text");
-      this._weatherLocationInfo.innerHTML = `Please choose exactly two Locations`;
+    } else {
+      this._weatherLocationInfo.classList.add("error-text");
     }
   }
 
   _validateWeatherMetrics() {
+    this._updateAnalyzeButtonState();
     const numberOfSelectedWeatherMetrics = this._selectedWeatherMetrics.length;
-
     if (numberOfSelectedWeatherMetrics < 1) {
       this._weatherMetricInfo.classList.add("error-text");
-      this._weatherMetricInfo.innerHTML = `You have to choose at least one Weather Metric`;
     } else {
       this._weatherMetricInfo.classList.remove("error-text");
-      this._weatherMetricInfo.innerHTML = `Choose your Weather Metrics`;
+    }
+  }
+
+  _validateWeatherDate() {
+    this._updateAnalyzeButtonState();
+    if (this._selectedDate == null) {
+      this._weatherDateInfo.classList.add("error-text");
+    } else {
+      this._weatherDateInfo.classList.remove("error-text");
     }
   }
 
@@ -122,6 +194,7 @@ class SidebarComponent extends HTMLElement {
           max-width: var(--sidebar-width);
           border-right: 1px solid var(--light-highlight-high);
           height: 100%;
+          position: absolute;
 
           section {
               margin-bottom: 1.5rem;
@@ -189,7 +262,7 @@ class SidebarComponent extends HTMLElement {
           .button-container {
               padding: 1.5rem 0;
 
-              .primary-button {
+              #analyze-button {
                   background-color: var(--light-gold);
                   margin-right: 0.75rem;
                   padding: 0.75rem;
@@ -197,9 +270,13 @@ class SidebarComponent extends HTMLElement {
                   border-radius: 8px;
                   color: var(--light-base);
                   cursor: pointer;
+
+                  &.analyze-button-invalid {
+                    background-color: var(--light-love);
+                  }
               }
 
-              .secondary-button {
+              #reset-button {
                   background-color: var(--light-base);
                   margin-right: 0.75rem;
                   padding: 0.75rem;
@@ -220,7 +297,7 @@ class SidebarComponent extends HTMLElement {
       <aside>
           <section>
               <h2 class="title">Select Location</h2>
-              <p id="weather-location-info" class="subtitle"></p>
+              <p id="weather-location-info" class="subtitle">Please choose exactly two Locations</p>
               <input
                   class="weather-locations-search"
                   type="text"
@@ -230,20 +307,20 @@ class SidebarComponent extends HTMLElement {
           </section>
           <section>
               <h2 class="title">Select Weather Metrics</h2>
-              <p id="weather-metric-info" class="subtitle"></p>
+              <p id="weather-metric-info" class="subtitle">Please choose at least one Metric</p>
               <div id="weather-metric-cards-container"></div>
           </section>
           <section>
               <h2 class="title">Pick a Date</h2>
-              <p class="subtitle">Please choose a Date for the Comparison</p>
+              <p id="weather-date-info" class="subtitle">Please choose a Date for the Comparison</p>
               <input id="weather-date" type="date" />
           </section>
           <section>
               <div class="button-container">
-                  <button id="analyze-button" class="primary-button">
+                  <button id="analyze-button">
                       Analyze
                   </button>
-                  <button id="reset-button" class="secondary-button">
+                  <button id="reset-button">
                       Reset
                   </button>
               </div>
@@ -251,6 +328,14 @@ class SidebarComponent extends HTMLElement {
       </aside>
     `;
     return template;
+  }
+
+  subscribe(subscriber) {
+    const index = this._subscribers.indexOf(subscriber);
+    if (index > 0) {
+      return;
+    }
+    this._subscribers.push(subscriber);
   }
 }
 

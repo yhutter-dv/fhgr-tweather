@@ -1,4 +1,4 @@
-class WeatherLocationCardComponent extends HTMLElement {
+export default class WeatherLocationCardComponent extends HTMLElement {
   constructor(locationName) {
     super();
     this._locationName = locationName;

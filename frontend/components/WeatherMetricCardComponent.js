@@ -1,4 +1,4 @@
-class WeatherMetricCardComponent extends HTMLElement {
+export default class WeatherMetricCardComponent extends HTMLElement {
   constructor(metric, metricTitle, metricDescription) {
     super();
     this._metric = metric;
