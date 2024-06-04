@@ -1,7 +1,8 @@
-from enum import StrEnum
+from dataclasses import dataclass
+from shared.weather_metric_enum import WeatherMetricEnum
 
-class WeatherMetric(StrEnum):
-    RAIN = "rain"
-    TEMPERATURE = "temperature"
-    HUMIDTY = "relative_humidity"
-    SNOWFALL = "snowfall"
+@dataclass
+class WeatherMetric:
+    identifier: WeatherMetricEnum
+    title: str
+    description: str

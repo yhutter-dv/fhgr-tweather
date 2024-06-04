@@ -4,7 +4,7 @@ import pandas as pd
 from openmeteo_requests import Client
 from openmeteo_sdk.WeatherApiResponse import VariablesWithTime
 
-from shared.weather_metric import WeatherMetric
+from shared.weather_metric_enum import WeatherMetricEnum
 from data.weather_data_request import WeatherDataRequest
 from data.weather_data_response import WeatherDataResponse
 
@@ -138,17 +138,17 @@ class WeatherApi:
         return df[metric_key].iloc[-1]
 
     def _generate_metric_key(
-        self, metric: WeatherMetric, altitude_in_meters: int
+        self, metric: WeatherMetricEnum, altitude_in_meters: int
     ) -> str | None:
         # For supported metrics see: https://open-meteo.com/en/docs
         match metric:
-            case WeatherMetric.TEMPERATURE:
+            case WeatherMetricEnum.TEMPERATURE:
                 return f"{metric}_{altitude_in_meters}m"
-            case WeatherMetric.HUMIDTY:
+            case WeatherMetricEnum.HUMIDTY:
                 return f"{metric}_{altitude_in_meters}m"
-            case WeatherMetric.RAIN:
+            case WeatherMetricEnum.RAIN:
                 return f"{metric}"
-            case WeatherMetric.SNOWFALL:
+            case WeatherMetricEnum.SNOWFALL:
                 return f"{metric}"
             case _:
                 return f"{metric}"

@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 
 from location.weather_location import WeatherLocation
-from shared.weather_metric import WeatherMetric
+from shared.weather_metric_enum import WeatherMetricEnum
 from data.weather_api import WeatherApi
 from data.weather_data_request import WeatherDataRequest
 
@@ -19,7 +19,7 @@ if __name__ == "__main__":
         # request_date = date.today()
 
         request = WeatherDataRequest(
-            location=location, date=request_date, metric=WeatherMetric.TEMPERATURE
+            location=location, date=request_date, metric=WeatherMetricEnum.TEMPERATURE
         )
         respone = api.make_request(request)
         print(f"Got Response for API Request: {respone}")
