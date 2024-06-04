@@ -139,11 +139,17 @@ class WeatherApi:
 
     def _generate_metric_key(
         self, metric: WeatherMetric, altitude_in_meters: int
-    ) -> str:
-        # TODO: Currently the only metric which supports altitude is TEMPERATURE
+    ) -> str | None:
+        # For supported metrics see: https://open-meteo.com/en/docs
         match metric:
             case WeatherMetric.TEMPERATURE:
                 return f"{metric}_{altitude_in_meters}m"
+            case WeatherMetric.HUMIDTY:
+                return f"{metric}_{altitude_in_meters}m"
+            case WeatherMetric.RAIN:
+                return f"{metric}"
+            case WeatherMetric.SNOWFALL:
+                return f"{metric}"
             case _:
                 return f"{metric}"
 
@@ -158,6 +164,9 @@ class WeatherApi:
     def make_request(self, request: WeatherDataRequest) -> WeatherDataResponse:
         try:
             metric_key = self._generate_metric_key(request.metric, altitude_in_meters=2)
+
+            if metric_key is None:
+                raise Exception(f"Unknown metric '{request.metric}'")
 
             today = date.today()
             value = None

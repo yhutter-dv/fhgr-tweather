@@ -11,7 +11,7 @@ if __name__ == "__main__":
         analyzer = WeatherAnalyzer()
         analysis_settings = WeatherAnalysisSettings(
             locations=["Chur", "Buchs SG"],
-            metrics=[WeatherMetric.TEMPERATURE],
+            metrics=[WeatherMetric.TEMPERATURE, WeatherMetric.RAIN],
             date=date.today())
         result = analyzer.analyze(analysis_settings)
         print(f"Got the following result {result}")
