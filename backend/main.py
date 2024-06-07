@@ -26,15 +26,6 @@ metrics = [
 
 app = FastAPI()
 
-# Enable CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 
 @app.post("/weather_analyze")
 def weather_analyze(settings: WeatherAnalysisSettings) -> list[WeatherAnalysisResult]:
@@ -52,3 +43,13 @@ def weather_locations() -> list[str]:
 @app.get("/weather_metrics")
 def weather_metrics() -> list[WeatherMetric]:
     return metrics
+
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)

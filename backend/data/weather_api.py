@@ -185,7 +185,7 @@ class WeatherApi:
                 location=request.location,
                 metric=request.metric,
                 date=request.date,
-                value=value,
+                value=float(value),
                 has_error=False,
                 error_reason="",
             )
