@@ -21,9 +21,19 @@ export default class SidebarComponent extends HTMLElement {
         description: "Make a comparison based on Temperature in °C",
       },
       {
+        metric: "snowfall",
+        title: "Snowfall",
+        description: "Amount of snow",
+      },
+      {
         metric: "rain",
         title: "Rain",
-        description: "Amount of rain",
+        description: "Amount of Rain",
+      },
+      {
+        metric: "relative_humidity",
+        title: "Humidity",
+        description: "Amount of Humidity",
       },
     ];
     this._selectedWeatherLocations = [];
