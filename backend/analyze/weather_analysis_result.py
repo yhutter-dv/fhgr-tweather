@@ -1,12 +1,12 @@
-
-from dataclasses import dataclass
 from datetime import date
-from location.weather_location import WeatherLocation
+from dataclasses import dataclass
+from analyze.weather_analysis_data import WeatherAnalysisData
 from shared.weather_metric_enum import WeatherMetricEnum
-from data.weather_data_response import WeatherDataResponse
+
 
 @dataclass
 class WeatherAnalysisResult:
     metric: WeatherMetricEnum
-    # TODO: Question if the same class should be used here or we should use another class
-    result: list[WeatherDataResponse]
+    metric_friendly_name: str
+    date: date
+    results: list[WeatherAnalysisData]

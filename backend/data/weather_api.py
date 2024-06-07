@@ -15,7 +15,7 @@ class WeatherApi:
     HISTORICAL_URL = "https://archive-api.open-meteo.com/v1/era5"
 
     # Technically up to 16 days of forecast are possible
-    MAX_FORECAST_DAYS = 7
+    MAX_FORECAST_DAYS = 16
 
     _instance = None
 
@@ -114,9 +114,7 @@ class WeatherApi:
 
         return values_for_date[metric_key].iloc[-1]
 
-    def _get_current_value(
-        self, request: WeatherDataRequest, metric_key: str
-    ) -> float:
+    def _get_current_value(self, request: WeatherDataRequest, metric_key: str) -> float:
         params = {
             "latitude": request.location.latitude,
             "longitude": request.location.longitude,
