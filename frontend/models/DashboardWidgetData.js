@@ -4,7 +4,8 @@ export default class DashboardWidgetData {
         this._date = new Date(analysisResult["date"]);
         this._locations = analysisResult.results.map(r => r["location_name"]);
         this._hasError = analysisResult.results.some(r => r["has_error"]);
-        this._errorReason = analysisResult.results.map(r => r["error_reason"]).join();
+        // Remove any duplicated error reasons and join them together
+        this._errorReason = [...new Set(analysisResult.results.map(r => r["error_reason"]))].join();
         this._values = analysisResult.results.map(r => r["value"]);
     }
 
