@@ -1,34 +1,34 @@
 export default class WeatherLocationCardComponent extends HTMLElement {
-  constructor(locationName) {
-    super();
-    this._locationName = locationName;
-    this._shadow = this.attachShadow({ mode: "open" });
-    this._shadow.append(this.template.content.cloneNode(true));
+    constructor(locationName) {
+        super();
+        this._locationName = locationName;
+        this._shadow = this.attachShadow({ mode: "open" });
+        this._shadow.append(this.template.content.cloneNode(true));
 
-    this._container = this._shadow.querySelector("[data-container]");
-  }
+        this._container = this._shadow.querySelector("[data-container]");
+    }
 
-  toggle() {
-    this._container.classList.toggle("weather-location-card-selected");
-  }
+    toggle() {
+        this._container.classList.toggle("weather-location-card-selected");
+    }
 
-  hide() {
-    this.style.display = "none";
-  }
+    hide() {
+        this.style.display = "none";
+    }
 
-  show() {
-    this.style.display = "block";
-  }
+    show() {
+        this.style.display = "block";
+    }
 
-  get name() {
-    return this._locationName;
-  }
+    get name() {
+        return this._locationName;
+    }
 
-  get styleTemplate() {
-    return `
+    get styleTemplate() {
+        return `
       .weather-location-card {
           display: flex;
-          padding: 1.5rem;
+          padding: 1rem;
           justify-content: center;
           align-items: center;
           background-color: var(--light-surface);
@@ -45,17 +45,17 @@ export default class WeatherLocationCardComponent extends HTMLElement {
           color: var(--light-base);
       }
     `;
-  }
+    }
 
-  get template() {
-    const template = document.createElement("template");
-    template.innerHTML = `
+    get template() {
+        const template = document.createElement("template");
+        template.innerHTML = `
       <style>${this.styleTemplate}</style>
       <div data-container class="weather-location-card">
         <p>${this._locationName}</p>
       </div>`;
-    return template;
-  }
+        return template;
+    }
 }
 
 customElements.define("weather-location-card", WeatherLocationCardComponent);
