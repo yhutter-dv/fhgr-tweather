@@ -6,6 +6,9 @@ export default class DashboardChartWidgetComponent extends HTMLElement {
         this._widgetData = widgetData;
         this._shadow = this.attachShadow({ mode: "open" });
         this._shadow.append(this.template.content.cloneNode(true));
+
+        this._chartDownloadButton = this._shadow.querySelector(".chart-download");
+        this._chartDownloadButton.addEventListener("click", () => this._exportChart());
     }
 
     _defaultChartOptions() {
@@ -63,6 +66,17 @@ export default class DashboardChartWidgetComponent extends HTMLElement {
         const chartContext = this._shadow.getElementById("chart");
         const chartOptions = this._defaultChartOptions();
         this._chart = new Chart(chartContext, chartOptions);
+    }
+
+    _exportChart() {
+        if (this._chart === null) {
+            return;
+        }
+        const linkElement = document.createElement('a');
+        linkElement.href = this._chart.toBase64Image();
+        linkElement.download = 'TweatherChartExport.png';
+        linkElement.click();
+        linkElement.remove();
     }
 
     connectedCallback() {
