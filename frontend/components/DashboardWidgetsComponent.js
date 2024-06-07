@@ -1,11 +1,10 @@
-import DashboardWidgetData from '../models/DashboardWidgetData';
 import DashboardChartWidgetComponent from './DashboardChartWidgetComponent';
 import DashboardTextWidgetComponent from './DashboardTextWidgetComponent';
 
 export default class DashboardWidgetsComponent extends HTMLElement {
-    constructor(analysisResult) {
+    constructor(widgetData) {
         super();
-        this._widgetData = new DashboardWidgetData(analysisResult);
+        this._widgetData = widgetData;
         this._shadow = this.attachShadow({ mode: "open" });
         this._shadow.append(this.template.content.cloneNode(true));
         this._dashboard_widgets_container = this._shadow.querySelector("[data-dashboard-widgets]");
