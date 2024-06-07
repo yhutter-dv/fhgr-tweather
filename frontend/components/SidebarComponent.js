@@ -6,29 +6,6 @@ export default class SidebarComponent extends HTMLElement {
     constructor() {
         super();
         this._subscribers = [];
-        // TODO: Fetch fia requests...
-        this._availableWeatherMetrics = [
-            {
-                metric: "temperature",
-                title: "Temperature",
-                description: "Make a comparison based on Temperature in °C",
-            },
-            {
-                metric: "snowfall",
-                title: "Snowfall",
-                description: "Amount of snow",
-            },
-            {
-                metric: "rain",
-                title: "Rain",
-                description: "Amount of Rain",
-            },
-            {
-                metric: "relative_humidity",
-                title: "Humidity",
-                description: "Amount of Humidity",
-            },
-        ];
         this._selectedWeatherLocations = [];
         this._selectedWeatherMetrics = [];
         this._selectedDate = null;
@@ -42,6 +19,7 @@ export default class SidebarComponent extends HTMLElement {
         this._validateWeatherDate();
 
         this._fetchWeatherLocations();
+        this._fetchWeatherMetrics();
     }
 
     get _settingsValid() {
@@ -64,6 +42,23 @@ export default class SidebarComponent extends HTMLElement {
         this._weatherLocationCards.forEach((x) => {
             x.addEventListener("click", () => this._onWeatherLocationCardClicked(x));
             this._weatherLocationCardsContainer.appendChild(x);
+        });
+    }
+
+    async _fetchWeatherMetrics() {
+        const API_BASE_URL = import.meta.env.VITE_API_URL;
+        const url = `${API_BASE_URL}/weather_metrics`;
+        const response = await fetch(url);
+        const metrics = await response.json();
+        this._availableWeatherMetrics = metrics;
+
+        this._weatherMetricCards = this._availableWeatherMetrics.map(
+            (x) => new WeatherMetricCardComponent(x),
+        );
+
+        this._weatherMetricCards.forEach((x) => {
+            x.addEventListener("click", () => this._onWeatherMetricCardClicked(x));
+            this._weatherMetricCardsContainer.appendChild(x);
         });
     }
 
@@ -119,14 +114,6 @@ export default class SidebarComponent extends HTMLElement {
             this._onWeatherLocationSearchButtonClicked(),
         );
 
-        this._weatherMetricCards = this._availableWeatherMetrics.map(
-            (x) => new WeatherMetricCardComponent(x.metric, x.title, x.description),
-        );
-
-        this._weatherMetricCards.forEach((x) => {
-            x.addEventListener("click", () => this._onWeatherMetricCardClicked(x));
-            this._weatherMetricCardsContainer.appendChild(x);
-        });
 
         this._weatherDate.addEventListener("change", (e) =>
             this._onWeatherDateChanged(),
@@ -199,6 +186,7 @@ export default class SidebarComponent extends HTMLElement {
     _validateWeatherMetrics() {
         this._updateAnalyzeButtonState();
         const numberOfSelectedWeatherMetrics = this._selectedWeatherMetrics.length;
+        console.log("Selected ", numberOfSelectedWeatherMetrics, " metrics");
         if (numberOfSelectedWeatherMetrics < 1) {
             this._weatherMetricInfo.classList.add("error-text");
         } else {

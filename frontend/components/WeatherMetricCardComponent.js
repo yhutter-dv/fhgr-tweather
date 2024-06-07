@@ -1,9 +1,9 @@
 export default class WeatherMetricCardComponent extends HTMLElement {
-    constructor(metric, metricTitle, metricDescription) {
+    constructor(metricResponse) {
         super();
-        this._metric = metric;
-        this._metricTitle = metricTitle;
-        this._metricDescription = metricDescription;
+        this._metric = metricResponse["identifier"];
+        this._metricTitle = metricResponse["title"];
+        this._metricDescription = metricResponse["description"];
 
         this._shadow = this.attachShadow({ mode: "open" });
         this._shadow.append(this.template.content.cloneNode(true));
