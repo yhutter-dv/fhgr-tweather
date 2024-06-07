@@ -9,7 +9,7 @@ from shared.weather_metric_enum import WeatherMetricEnum
 class WeatherDataResponse:
     location: WeatherLocation
     date: date
-    metric: WeatherMetricEnum
-    value: float
+    metrics: list[WeatherMetricEnum]
+    values: list[float]
     has_error: bool
     error_reason: str

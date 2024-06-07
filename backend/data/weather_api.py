@@ -28,7 +28,7 @@ class WeatherApi:
         self._client = Client()
 
     def _create_df_from_variables_with_time(
-        self, variables: VariablesWithTime, metric_key: str, has_hourly=True
+        self, variables: VariablesWithTime, metric_keys: list[str], has_hourly=True
     ) -> pd.DataFrame:
         data: dict = {
             "date_time": pd.date_range(
@@ -40,26 +40,31 @@ class WeatherApi:
         }
 
         # Currently we can always assume that we only have one variable because we only support one metric at a time.
-        variable = variables.Variables(0)
-        if variable is None:
-            raise Exception("Could not get first variable")
+        for index, metric_key in enumerate(metric_keys):
+            metric_variable = variables.Variables(index)
+            if metric_variable is None:
+                raise Exception("Could not get first variable")
 
-        data[metric_key] = variable.ValuesAsNumpy() if has_hourly else variable.Value()
+            data[metric_key] = (
+                metric_variable.ValuesAsNumpy()
+                if has_hourly
+                else metric_variable.Value()
+            )
 
         df = pd.DataFrame(data)
         df.dropna(inplace=True)
         return df
 
-    def _get_historical_value(
-        self, request: WeatherDataRequest, metric_key: str
-    ) -> float:
+    def _get_historical_values(
+        self, request: WeatherDataRequest, metric_keys: list[str]
+    ) -> list[float]:
         date_str = f"{request.date}"
         params = {
             "latitude": request.location.latitude,
             "longitude": request.location.longitude,
             "start_date": date_str,
             "end_date": date_str,
-            "hourly": metric_key,
+            "hourly": metric_keys,
         }
         responses = self._client.weather_api(self.FORECAST_URL, params)
 
@@ -71,7 +76,7 @@ class WeatherApi:
                 "No hourly data received for request make_historical_request"
             )
 
-        df = self._create_df_from_variables_with_time(hourly, metric_key=metric_key)
+        df = self._create_df_from_variables_with_time(hourly, metric_keys=metric_keys)
 
         # Filter out the data which matches the date and return the latest one
         values_for_date = df[df["date_time"].dt.date == request.date]
@@ -82,15 +87,16 @@ class WeatherApi:
         if values_for_date.empty:
             raise Exception(f"No data found for date '{request.date}'")
 
-        return values_for_date[metric_key].iloc[-1]
+        values = [values_for_date[metric_key].iloc[-1] for metric_key in metric_keys]
+        return values
 
-    def _get_forecast_value(
-        self, request: WeatherDataRequest, metric_key: str
-    ) -> float:
+    def _get_forecast_values(
+        self, request: WeatherDataRequest, metric_keys: list[str]
+    ) -> list[float]:
         params = {
             "latitude": request.location.latitude,
             "longitude": request.location.longitude,
-            "hourly": metric_key,
+            "hourly": metric_keys,
             "forecast_days": self.MAX_FORECAST_DAYS,
         }
         responses = self._client.weather_api(self.FORECAST_URL, params)
@@ -101,7 +107,7 @@ class WeatherApi:
         if hourly is None:
             raise Exception("No hourly data received for request make_forecast_request")
 
-        df = self._create_df_from_variables_with_time(hourly, metric_key=metric_key)
+        df = self._create_df_from_variables_with_time(hourly, metric_keys=metric_keys)
 
         # Filter out the data which matches the date and return the latest one
         values_for_date = df[df["date_time"].dt.date == request.date]
@@ -112,13 +118,16 @@ class WeatherApi:
         if values_for_date.empty:
             raise Exception(f"No data found for date '{request.date}'")
 
-        return values_for_date[metric_key].iloc[-1]
+        values = [values_for_date[metric_key].iloc[-1] for metric_key in metric_keys]
+        return values
 
-    def _get_current_value(self, request: WeatherDataRequest, metric_key: str) -> float:
+    def _get_current_values(
+        self, request: WeatherDataRequest, metric_keys: list[str]
+    ) -> list[float]:
         params = {
             "latitude": request.location.latitude,
             "longitude": request.location.longitude,
-            "current": metric_key,
+            "current": metric_keys,
         }
         responses = self._client.weather_api(self.FORECAST_URL, params)
 
@@ -129,11 +138,11 @@ class WeatherApi:
             raise Exception("No current data received for request make_current_request")
 
         df = self._create_df_from_variables_with_time(
-            current, metric_key=metric_key, has_hourly=False
+            current, metric_keys=metric_keys, has_hourly=False
         )
 
-        # Return last value
-        return df[metric_key].iloc[-1]
+        values = [df[metric_key].iloc[-1] for metric_key in metric_keys]
+        return values
 
     def _generate_metric_key(
         self, metric: WeatherMetricEnum, altitude_in_meters: int
@@ -161,42 +170,48 @@ class WeatherApi:
 
     def make_request(self, request: WeatherDataRequest) -> WeatherDataResponse:
         try:
-            metric_key = self._generate_metric_key(request.metric, altitude_in_meters=2)
+            metric_keys = [
+                self._generate_metric_key(key, altitude_in_meters=2)
+                for key in request.metrics
+            ]
 
-            if metric_key is None:
-                raise Exception(f"Unknown metric '{request.metric}'")
+            # Ignore unknown metric keys
+            metric_keys = [key for key in metric_keys if key is not None]
 
             today = date.today()
-            value = None
+            values = []
 
             # Current
             if request.date == today:
-                value = self._get_current_value(request, metric_key=metric_key)
+                values = self._get_current_values(request, metric_keys=metric_keys)
 
             # Forecast
             elif request.date > today:
                 self._ensure_forecast_date(request.date)
-                value = self._get_forecast_value(request, metric_key=metric_key)
+                values = self._get_forecast_values(request, metric_keys=metric_keys)
             # Historical
             else:
-                value = self._get_historical_value(request, metric_key=metric_key)
+                values = self._get_historical_values(request, metric_keys=metric_keys)
+
+            # Convert to float (needed because we get numpy.float type)
+            values = [float(value) for value in values]
 
             response = WeatherDataResponse(
                 location=request.location,
-                metric=request.metric,
+                metrics=request.metrics,
                 date=request.date,
-                value=float(value),
+                values=values,
                 has_error=False,
                 error_reason="",
             )
+            return response
         except Exception as ex:
             response = WeatherDataResponse(
                 location=request.location,
-                metric=request.metric,
+                metrics=request.metrics,
                 date=request.date,
-                value=0.0,
+                values=[],
                 has_error=True,
                 error_reason=f"{ex}",
             )
-        finally:
             return response

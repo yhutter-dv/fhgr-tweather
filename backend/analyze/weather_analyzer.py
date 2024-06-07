@@ -5,6 +5,7 @@ from analyze.weather_analysis_settings import (
     WeatherAnalysisSettings,
 )
 from data.weather_data_request import WeatherDataRequest
+from data.weather_data_response import WeatherDataResponse
 from location.weather_location_repository import WeatherLocationRepository
 
 
@@ -42,22 +43,31 @@ class WeatherAnalyzer:
 
         analysis_results = []
 
-        # TODO: Optimize this so that we can pass a list of metrics instead to the weather api...
-        for metric in settings.metrics:
-            results: list[WeatherAnalysisData] = []
-            for location in locations:
-                request = WeatherDataRequest(
-                    location=location, date=date, metric=metric
-                )
-                response = self._weather_api.make_request(request)
+        # This is  a lookup dictionary in order to associated a given metrics with a list of received WeatherAnalysisData
+        data_for_metrics: dict[str, list[WeatherAnalysisData]] = dict()
+
+        # Make a request per location and pass the metrics as a list
+        for location in locations:
+            request = WeatherDataRequest(
+                location=location, date=date, metrics=settings.metrics
+            )
+            response = self._weather_api.make_request(request)
+            for index, metric in enumerate(response.metrics):
+                value = response.values[index] if not response.has_error else None
                 data = WeatherAnalysisData(
                     location_name=location.name,
-                    value=response.value,
+                    value=value,
                     has_error=response.has_error,
                     error_reason=response.error_reason,
                 )
-                results.append(data)
+                # Initialize list if key does not exist
+                if data_for_metrics.get(metric) is None:
+                    data_for_metrics[metric] = []
 
+                data_for_metrics[metric].append(data)
+
+        for metric in settings.metrics:
+            results = data_for_metrics[metric]
             analysis_result = WeatherAnalysisResult(
                 metric=metric,
                 metric_friendly_name=metric.friendly_name(),

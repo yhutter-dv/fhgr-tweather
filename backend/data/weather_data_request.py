@@ -8,4 +8,4 @@ from shared.weather_metric_enum import WeatherMetricEnum
 class WeatherDataRequest:
     location: WeatherLocation
     date: datetime.date
-    metric: WeatherMetricEnum
+    metrics: list[WeatherMetricEnum]

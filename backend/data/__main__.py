@@ -19,7 +19,13 @@ if __name__ == "__main__":
         # request_date = date.today()
 
         request = WeatherDataRequest(
-            location=location, date=request_date, metric=WeatherMetricEnum.TEMPERATURE
+            location=location,
+            date=request_date,
+            metrics=[
+                WeatherMetricEnum.TEMPERATURE,
+                WeatherMetricEnum.RAIN,
+                WeatherMetricEnum.SNOWFALL,
+            ],
         )
         respone = api.make_request(request)
         print(f"Got Response for API Request: {respone}")
