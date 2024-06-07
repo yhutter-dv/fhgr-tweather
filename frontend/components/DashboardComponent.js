@@ -36,13 +36,13 @@ class DashboardComponent extends HTMLElement {
             },
         };
         const response = await fetch(url, requestParams);
-        const analyze_results = await response.json();
-        console.log("Got the following results ", analyze_results);
+        const analysisResults = await response.json();
         this._container.innerHTML = "";
+
         // TODO: Check for errors and notify user if anything wrong has happened...
-        analyze_results.forEach((r) => {
+        analysisResults.forEach((r) => {
             this._container.appendChild(
-                new DashboardWidgetsComponent(r.metric, r.result),
+                new DashboardWidgetsComponent(r),
             );
         });
     }
@@ -65,11 +65,11 @@ class DashboardComponent extends HTMLElement {
     get template() {
         const template = document.createElement("template");
         template.innerHTML = `
-      <style>${this.styleTemplate}</style>
-      <header-component></header-component>
-      <sidebar-component></sidebar-component>
-      <main data-container></main>
-    `;
+          <style>${this.styleTemplate}</style>
+          <header-component></header-component>
+          <sidebar-component></sidebar-component>
+          <main data-container></main>
+        `;
         return template;
     }
 

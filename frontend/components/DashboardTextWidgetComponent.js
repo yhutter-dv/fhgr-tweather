@@ -1,13 +1,19 @@
 export default class DashboardTextWidgetComponent extends HTMLElement {
-    constructor(results) {
+    constructor(widgetData) {
         super()
-        this._locationNameOne = results[0].location.name;
-        this._locationNameTwo = results[1].location.name;
-        this._valueOne = results[0].value;
-        this._valueTwo = results[1].value;
-        this._text = `${this._locationNameOne} has a value of ${this._valueOne} whereas ${this._locationNameTwo} has a value of ${this._valueTwo}`;
+        this._widgetData = widgetData;
+        this._text = this._createText();
         this._shadow = this.attachShadow({ mode: "open" });
         this._shadow.append(this.template.content.cloneNode(true));
+    }
+
+    _createText() {
+        const locationOne = this._widgetData.locations[0];
+        const locationTwo = this._widgetData.locations[1];
+        const valueOne = this._widgetData.values[0].toFixed(2);
+        const valueTwo = this._widgetData.values[1].toFixed(2);
+        const difference = Math.abs(valueOne - valueTwo).toFixed(2);
+        return `${locationOne} has a value of ${valueOne} whereas ${locationTwo} has a value of ${valueTwo}. The difference is ${difference}`;
     }
 
     get styleTemplate() {

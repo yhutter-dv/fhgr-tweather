@@ -1,12 +1,9 @@
 import { Chart } from "chart.js";
 
 export default class DashboardChartWidgetComponent extends HTMLElement {
-    constructor(results) {
+    constructor(widgetData) {
         super()
-        this._locationNameOne = results[0].location.name;
-        this._locationNameTwo = results[1].location.name;
-        this._valueOne = results[0].value;
-        this._valueTwo = results[1].value;
+        this._widgetData = widgetData;
         this._shadow = this.attachShadow({ mode: "open" });
         this._shadow.append(this.template.content.cloneNode(true));
     }
@@ -17,16 +14,19 @@ export default class DashboardChartWidgetComponent extends HTMLElement {
 
         const goldColor = getComputedStyle(root).getPropertyValue("--light-gold");
 
+        const labels = this._widgetData.locations;
+        const data = this._widgetData.values;
+
         return {
             type: "bar",
             data: {
-                labels: [this._locationNameOne, this._locationNameTwo],
+                labels: labels,
                 datasets: [
                     {
                         borderRadius: 5,
                         barPercentage: 0.4,
                         categoryPercentage: 1.0,
-                        data: [this._valueOne, this._valueTwo],
+                        data: data,
                         backgroundColor: [foamColor, goldColor],
                         borderWidth: 0,
                     },
@@ -115,7 +115,7 @@ export default class DashboardChartWidgetComponent extends HTMLElement {
           <section>
               <div class="chart-container">
                   <div class="chart-header">
-                      <p>30.03.2024</p>
+                      <p>${this._widgetData.date}</p>
                       <div class="chart-download">
                           <svg
                               xmlns="http://www.w3.org/2000/svg"
