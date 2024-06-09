@@ -1,6 +1,5 @@
 import unittest
 
-from location.weather_location import WeatherLocation
 from location.weather_location_repository import WeatherLocationRepository
 
 
@@ -10,6 +9,11 @@ class TestWeatherLocationRepository(unittest.TestCase):
         result = repository.find_location_by_name("Chur")
 
         self.assertIsNotNone(result)
+
+        # Needed in order to satisfy the python linter as it does not seem to understand that
+        # this variable cannot be None anymore because of the assert above.
+        if result is None:
+            return
         self.assertEqual("Chur", result.name)
         self.assertEqual(7000, result.postal_code)
 
