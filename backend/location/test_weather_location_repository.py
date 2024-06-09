@@ -14,6 +14,7 @@ class TestWeatherLocationRepository(unittest.TestCase):
         # this variable cannot be None anymore because of the assert above.
         if result is None:
             return
+
         self.assertEqual("Chur", result.name)
         self.assertEqual(7000, result.postal_code)
 
