@@ -115,7 +115,7 @@ export default class SidebarComponent extends HTMLElement {
         );
 
 
-        this._weatherDate.addEventListener("change", (e) =>
+        this._weatherDate.addEventListener("change", () =>
             this._onWeatherDateChanged(),
         );
 

@@ -1,12 +1,12 @@
 export default class HeaderComponent extends HTMLElement {
-  constructor() {
-    super();
-    this.shadow = this.attachShadow({ mode: "open" });
-    this.shadow.append(this.template.content.cloneNode(true));
-  }
+    constructor() {
+        super();
+        this.shadow = this.attachShadow({ mode: "open" });
+        this.shadow.append(this.template.content.cloneNode(true));
+    }
 
-  get styleTemplate() {
-    return `
+    get styleTemplate() {
+        return `
       header {
           display: flex;
           padding: 1rem 2rem;
@@ -32,11 +32,11 @@ export default class HeaderComponent extends HTMLElement {
           }
       }
     `;
-  }
+    }
 
-  get template() {
-    const template = document.createElement("template");
-    template.innerHTML = `
+    get template() {
+        const template = document.createElement("template");
+        template.innerHTML = `
       <style>${this.styleTemplate}</style>
       <header>
           <svg
@@ -53,8 +53,8 @@ export default class HeaderComponent extends HTMLElement {
           <h1 class="header-text">Tweather</h1>
       </header>
     `;
-    return template;
-  }
+        return template;
+    }
 }
 
 customElements.define("header-component", HeaderComponent);

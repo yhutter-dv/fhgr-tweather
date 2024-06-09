@@ -1,11 +1,4 @@
-import os
-import sys
-import json
-from datetime import date
-from analyze.weather_analysis_settings import WeatherAnalysisSettings
-from location.weather_location import WeatherLocation
 from location.weather_location_repository import WeatherLocationRepository
-from shared.weather_metric_enum import WeatherMetricEnum
 
 
 if __name__ == "__main__":

@@ -5,7 +5,6 @@ from analyze.weather_analysis_settings import (
     WeatherAnalysisSettings,
 )
 from data.weather_data_request import WeatherDataRequest
-from data.weather_data_response import WeatherDataResponse
 from location.weather_location_repository import WeatherLocationRepository
 
 
