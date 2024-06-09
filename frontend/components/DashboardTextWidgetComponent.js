@@ -1,4 +1,11 @@
+
+// eslint-disable-next-line no-unused-vars
+import DashboardWidgetData from "../models/DashboardWidgetData";
+
 export default class DashboardTextWidgetComponent extends HTMLElement {
+    /** 
+        * @param {DashboardWidgetData} widgetData - The Data for the Widget.
+    */
     constructor(widgetData) {
         super()
         this._widgetData = widgetData;
@@ -7,6 +14,10 @@ export default class DashboardTextWidgetComponent extends HTMLElement {
         this._shadow.append(this.template.content.cloneNode(true));
     }
 
+    /** 
+        * Creates a text message from the current data.
+        * @returns {string}
+    */
     _createText() {
         const locationOne = this._widgetData.locations[0];
         const locationTwo = this._widgetData.locations[1];

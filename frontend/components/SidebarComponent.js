@@ -6,8 +6,14 @@ export default class SidebarComponent extends HTMLElement {
     constructor() {
         super();
         this._subscribers = [];
+
+        /** @type {string[]} */
         this._selectedWeatherLocations = [];
+
+        /** @type {string[]} */
         this._selectedWeatherMetrics = [];
+
+        /** @type {Date} */
         this._selectedDate = null;
 
         this._shadow = this.attachShadow({ mode: "open" });
@@ -22,6 +28,10 @@ export default class SidebarComponent extends HTMLElement {
         this._fetchWeatherMetrics();
     }
 
+    /** 
+        * Checks if the current settings are valid.
+        * @returns {boolean}
+    */
     get _settingsValid() {
         return (
             this._selectedWeatherMetrics.length >= 1 &&
@@ -30,6 +40,9 @@ export default class SidebarComponent extends HTMLElement {
         );
     }
 
+    /** 
+        * Fetches all Weather Locations from the backend.
+    */
     async _fetchWeatherLocations() {
         const API_BASE_URL = import.meta.env.VITE_API_URL;
         const url = `${API_BASE_URL}/weather_locations`;
@@ -45,6 +58,9 @@ export default class SidebarComponent extends HTMLElement {
         });
     }
 
+    /** 
+        * Fetches all Weather Metrics from the backend.
+    */
     async _fetchWeatherMetrics() {
         const API_BASE_URL = import.meta.env.VITE_API_URL;
         const url = `${API_BASE_URL}/weather_metrics`;
@@ -62,6 +78,9 @@ export default class SidebarComponent extends HTMLElement {
         });
     }
 
+    /** 
+        * Updates the disabled/enabled state of the Analyze Button.
+    */
     _updateAnalyzeButtonState() {
         if (!this._settingsValid) {
             this._analyzeButton.classList.add("analyze-button-invalid");
@@ -70,11 +89,16 @@ export default class SidebarComponent extends HTMLElement {
         }
     }
 
+    /** 
+        * Gets called when the user has clicked on the Search Button for searching a specific location. 
+    */
     _onWeatherLocationSearchButtonClicked() {
+        // Remove any whitespace characters.
         const search = this._weatherLocationSearch.value.trim();
 
-        // Show or hide depending if the name matches the searched text
+        // Show or hide depending if the name includes the searched text
         this._weatherLocationCards.forEach((x) => {
+            // Ignore casing
             if (x.name.toLowerCase().includes(search.toLowerCase())) {
                 x.show();
             } else {
@@ -83,8 +107,10 @@ export default class SidebarComponent extends HTMLElement {
         });
     }
 
+    /** 
+        * Gets all needed references to HTML Elements etc. 
+    */
     _initElements() {
-        // Get necessary references to HTML Elements
         this._weatherLocationSearch = this._shadow.querySelector("[data-search]");
         this._weatherLocationSearchButton = this._shadow.querySelector(
             "#weather-location-search-button",
@@ -125,19 +151,28 @@ export default class SidebarComponent extends HTMLElement {
         );
     }
 
+    /** 
+        * Gets called when the user has selected a date. 
+    */
     _onWeatherDateChanged() {
         this._selectedDate = this._weatherDate.value;
         this._validateWeatherDate();
     }
 
+    /** 
+        * Gets called when the user has clicked the analyze button. 
+    */
     _onAnalyzeButtonClicked() {
-        if (!this._settingsValid) {
-            return;
-        }
         this._notifySettingsChanged();
     }
 
+    /** 
+        * Notify any subscribers about changed settings. Only notify if settings are actually valid. 
+    */
     _notifySettingsChanged() {
+        if (!this._settingsValid) {
+            return;
+        }
         const settings = new SidebarSettings(
             this._selectedWeatherLocations,
             this._selectedWeatherMetrics,
@@ -146,6 +181,9 @@ export default class SidebarComponent extends HTMLElement {
         this._subscribers.forEach((s) => s.onSettingsChanged(settings));
     }
 
+    /** 
+        * Gets called when the user has clicked on a Weather Location Card (e.g Chur etc.). 
+    */
     _onWeatherLocationCardClicked(card) {
         card.toggle();
         const index = this._selectedWeatherLocations.indexOf(card.name);
@@ -159,6 +197,9 @@ export default class SidebarComponent extends HTMLElement {
         this._validateWeatherLocations();
     }
 
+    /** 
+        * Gets called when the user has clicked on a Weather Metric Card (e.g Temperature). 
+    */
     _onWeatherMetricCardClicked(card) {
         card.toggle();
         const index = this._selectedWeatherMetrics.indexOf(card.metric);
@@ -172,6 +213,9 @@ export default class SidebarComponent extends HTMLElement {
         this._validateWeatherMetrics();
     }
 
+    /** 
+        * Validates the Selected Weather Locations and updates the info message if needed. 
+    */
     _validateWeatherLocations() {
         this._updateAnalyzeButtonState();
         const numberOfSelectedWeatherLocations =
@@ -183,10 +227,12 @@ export default class SidebarComponent extends HTMLElement {
         }
     }
 
+    /** 
+        * Validates the Selected Weather Metrics and updates the info message if needed. 
+    */
     _validateWeatherMetrics() {
         this._updateAnalyzeButtonState();
         const numberOfSelectedWeatherMetrics = this._selectedWeatherMetrics.length;
-        console.log("Selected ", numberOfSelectedWeatherMetrics, " metrics");
         if (numberOfSelectedWeatherMetrics < 1) {
             this._weatherMetricInfo.classList.add("error-text");
         } else {
@@ -194,6 +240,9 @@ export default class SidebarComponent extends HTMLElement {
         }
     }
 
+    /** 
+        * Validates the Selected Weather Date and updates the info message if needed. 
+    */
     _validateWeatherDate() {
         this._updateAnalyzeButtonState();
         if (this._selectedDate == null) {
@@ -368,6 +417,9 @@ export default class SidebarComponent extends HTMLElement {
         return template;
     }
 
+    /*
+        * Adds a subscriber to the list
+    */
     subscribe(subscriber) {
         const index = this._subscribers.indexOf(subscriber);
         if (index > 0) {

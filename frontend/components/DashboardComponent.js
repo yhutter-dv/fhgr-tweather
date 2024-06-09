@@ -2,63 +2,99 @@ import { Chart, registerables } from "chart.js";
 import DashboardWidgetsComponent from "./DashboardWidgetsComponent";
 
 // Important: These imports here are necessary so that the component gets registered as custom web components.
-// Do not remove them
+// Do not remove them furthermore some of them are used in the JsDoc Comments so they need to be imported.
+
+// eslint-disable-next-line no-unused-vars
 import SidebarComponent from "./SidebarComponent";
+// eslint-disable-next-line no-unused-vars
 import HeaderComponent from "./HeaderComponent";
+// eslint-disable-next-line no-unused-vars
+import SidebarSettings from "../models/SidebarSettings";
+
 import DashboardWidgetData from "../models/DashboardWidgetData";
 
 class DashboardComponent extends HTMLElement {
     constructor() {
         super();
 
-        // Needed in order to use the various Chart Types of Chartjs.
+        // Needed in order to use the various Chart Types of ChartJs.
         Chart.register(...registerables);
 
         this._shadow = this.attachShadow({ mode: "open" });
         this._shadow.append(this.template.content.cloneNode(true));
         this._container = this._shadow.querySelector("[data-container]");
 
+        /** @type {SidebarComponent} */
         this._sidebar = this._shadow.querySelector("sidebar-component");
         this._sidebar.subscribe(this);
 
+        /** @type {SidebarSettings} */
+        this._settings = null;
+
+        // Get references to the HTML Elements such as the error dialog etc.
         this._error_dialog = this._shadow.querySelector("#error-dialog");
         this._error_dialog_description = this._shadow.querySelector("[data-error-description]");
         this._error_dialog_close_button = this._shadow.querySelector("#error-dialog-close");
         this._error_dialog_close_button.addEventListener("click", () => this._closeErrorDialog());
     }
 
+    /** 
+        * Closes the error dialog.
+    */
     _closeErrorDialog() {
         this._error_dialog.close();
     }
 
+    /** 
+        * Shows an Error Dialog with a given message.
+        * @param {string} message - The message which should be displayed
+    */
     _showErrorDialog(message) {
         this._error_dialog_description.innerHTML = message;
         this._error_dialog.show();
     }
 
-    async _updateDashboard(settings) {
+    /** 
+        * Makes an analyze request with the current settings.
+    */
+    async _makeAnalyzeRequest() {
+        if (this._settings === null) {
+            return;
+        }
         const API_BASE_URL = import.meta.env.VITE_API_URL;
         const url = `${API_BASE_URL}/weather_analyze`;
         const requestParams = {
             method: "POST",
             body: JSON.stringify({
-                locations: settings.locations,
-                metrics: settings.metrics,
-                date: settings.date,
+                locations: this._settings.locations,
+                metrics: this._settings.metrics,
+                date: this._settings.date,
             }),
             headers: {
                 "Content-type": "application/json",
             },
         };
+        const response = await fetch(url, requestParams);
+        const analysisResults = await response.json();
+        return analysisResults;
+    }
 
+
+    /** 
+        * Updates the dashboard according to current settings.
+    */
+    async _updateDashboardWithCurrentSettings() {
         try {
             // Close any open error dialog
             this._closeErrorDialog();
 
-            const response = await fetch(url, requestParams);
-            const analysisResults = await response.json();
+            const analysisResults = await this._makeAnalyzeRequest();
+
+            // Clear out the existing widgets.
             this._container.innerHTML = "";
 
+            // Create the dashboard widgets according to the Analysis Results
+            // Only create them if we have no errors. If we do have any error show the error dialog.
             for (let i = 0; i < analysisResults.length; i++) {
                 const analysisResult = analysisResults[i];
                 const widgetData = new DashboardWidgetData(analysisResult);
@@ -71,9 +107,9 @@ class DashboardComponent extends HTMLElement {
                 );
             }
         } catch (e) {
+            // In case something unexpected happens also show the error dialog.
             this._showErrorDialog(e.stack);
         }
-
     }
 
     get styleTemplate() {
@@ -127,8 +163,13 @@ class DashboardComponent extends HTMLElement {
         return template;
     }
 
+    /** 
+        * Gets called when the settings in the sidebar components have changed and are valid 
+        * @param {SidebarSettings} settings - The changed and valid settings. 
+    */
     onSettingsChanged(settings) {
-        this._updateDashboard(settings);
+        this._settings = settings;
+        this._updateDashboardWithCurrentSettings();
     }
 }
 

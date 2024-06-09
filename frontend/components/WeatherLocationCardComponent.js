@@ -1,4 +1,7 @@
 export default class WeatherLocationCardComponent extends HTMLElement {
+    /** 
+        * @param {string} locationName - The name for a given location (e.g Buchs).
+    */
     constructor(locationName) {
         super();
         this._locationName = locationName;
@@ -8,18 +11,31 @@ export default class WeatherLocationCardComponent extends HTMLElement {
         this._container = this._shadow.querySelector("[data-container]");
     }
 
+    /** 
+        * Toggles the card to be active/inactive.
+    */
     toggle() {
         this._container.classList.toggle("weather-location-card-selected");
     }
 
+    /** 
+        * Hides the card. 
+    */
     hide() {
         this.style.display = "none";
     }
 
+    /** 
+        * Shows the card. 
+    */
     show() {
         this.style.display = "block";
     }
 
+    /** 
+        * Returns the location name for the card. 
+        * @returns {string}
+    */
     get name() {
         return this._locationName;
     }

@@ -1,6 +1,9 @@
 import { Chart } from "chart.js";
 
 export default class DashboardChartWidgetComponent extends HTMLElement {
+    /** 
+        * @param {DashboardWidgetData} widgetData - The Data for the Widget.
+    */
     constructor(widgetData) {
         super()
         this._widgetData = widgetData;
@@ -8,9 +11,12 @@ export default class DashboardChartWidgetComponent extends HTMLElement {
         this._shadow.append(this.template.content.cloneNode(true));
 
         this._chartDownloadButton = this._shadow.querySelector(".chart-download");
-        this._chartDownloadButton.addEventListener("click", () => this._exportChart());
+        this._chartDownloadButton.addEventListener("click", () => this._exportChartAsImage());
     }
 
+    /** 
+        * Returns the default chart options. See https://www.chartjs.org/docs/latest/general/options.html for further information
+    */
     _defaultChartOptions() {
         const root = document.querySelector(":root");
         const foamColor = getComputedStyle(root).getPropertyValue("--light-foam");
@@ -20,6 +26,7 @@ export default class DashboardChartWidgetComponent extends HTMLElement {
         const labels = this._widgetData.locations;
         const data = this._widgetData.values;
 
+        // Currently we only support bar charts.
         return {
             type: "bar",
             data: {
@@ -62,13 +69,20 @@ export default class DashboardChartWidgetComponent extends HTMLElement {
     }
 
 
+    /** 
+        * Initializes the Chart Context. Note that this method HAS to be called after the Component has mounted (e.g connectedCallback).
+        * Otherweise the Canvas Element from which the context is retrieved is not ready yet.
+    */
     _initChart() {
         const chartContext = this._shadow.getElementById("chart");
         const chartOptions = this._defaultChartOptions();
         this._chart = new Chart(chartContext, chartOptions);
     }
 
-    _exportChart() {
+    /** 
+        * Exports the Chart as an Image File 
+    */
+    _exportChartAsImage() {
         if (this._chart === null) {
             return;
         }
@@ -79,6 +93,9 @@ export default class DashboardChartWidgetComponent extends HTMLElement {
         linkElement.remove();
     }
 
+    /** 
+        * Callback which automatically gets called once the WebComponent is attached to the DOM. 
+    */
     connectedCallback() {
         this._initChart();
     }

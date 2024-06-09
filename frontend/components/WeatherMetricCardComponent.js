@@ -1,4 +1,7 @@
 export default class WeatherMetricCardComponent extends HTMLElement {
+    /** 
+        * @param {any} metricResponse - The response for a single metric object from the backend.
+    */
     constructor(metricResponse) {
         super();
         this._metric = metricResponse["identifier"];
@@ -11,10 +14,17 @@ export default class WeatherMetricCardComponent extends HTMLElement {
         this._container = this._shadow.querySelector("[data-container]");
     }
 
+    /** 
+        * Toggles the card to be active/inactive.
+    */
     toggle() {
         this._container.classList.toggle("weather-metric-card-selected");
     }
 
+    /** 
+        * Returns the identifier for the metric (e.g 'temperature' etc.).
+        * @returns {string}
+    */
     get metric() {
         return this._metric;
     }

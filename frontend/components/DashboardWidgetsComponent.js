@@ -1,7 +1,12 @@
+// eslint-disable-next-line no-unused-vars
+import DashboardWidgetData from '../models/DashboardWidgetData';
 import DashboardChartWidgetComponent from './DashboardChartWidgetComponent';
 import DashboardTextWidgetComponent from './DashboardTextWidgetComponent';
 
 export default class DashboardWidgetsComponent extends HTMLElement {
+    /** 
+        * @param {DashboardWidgetData} widgetData - The Data for the Widgets.
+    */
     constructor(widgetData) {
         super();
         this._widgetData = widgetData;
