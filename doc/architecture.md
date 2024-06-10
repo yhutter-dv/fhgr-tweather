@@ -6,89 +6,59 @@ The whole applications is split up into `different context`. Each context serves
 
 |Context|Description|
 |--|----|
-|Analysis Settings Context|This context holds all objects related to settings needed for an Analysis|
+|Shared Context|This context only holds Models which are shared between Contexts.|
+|Location Context|This context holds all objects related to Weather Locations|
+|Data Context|This context holds all objects responsible for retrieving the actual data|
 |Analyze Context|This context holds all objects responsible for actually doing the analysis|
-|Data Context|This context holds all objects responsible for retrieving and caching the actual data|
-|Dashboard Context|This context holds all objects responsible for displaying the actual dashboard|
 
 ```mermaid
 ---
-title: Analysis Settings Context
+title: Shared Context
 ---
 classDiagram
 
-    AnalysisSettingsManager *-- WeatherAnalysisSettings
-    AnalysisSettingsManager *-- WeatherLocationRepository
-    AnalysisSettingsManager .. AnalysisSettingsSubscriber
-    WeatherAnalysisSettings *-- WeatherAnalysisType
-    WeatherAnalysisSettings *-- WeatherAnalysisConfig
-    WeatherAnalysisConfig *-- WeatherMetric
-    WeatherAnalysisConfig *-- WeatherLocation
-
-    class AnalysisSettingsSubscriber {
-        <<interface>>
-        + on_settings_changed(WeatherAnalysisSettings settings)
-    }
-
-    class WeatherMetric {
+    class WeatherMetricEnum {
         <<enumeration>>
         RAIN,
         TEMPERATURE,
-        HUMIDTY
+        HUMIDTY,
+        SNOWFALL
     }
 
-    class WeatherAnalysisType {
-        <<enumeration>>
-        TEXT,
-        CHART
+    class WeatherMetric {
+        + WeatherMetricEnum identifier
+        + String title
+        + String description
     }
+```
 
+```mermaid
+---
+title: Location Context
+---
+classDiagram
+
+    WeatherLocationRepository *-- WeatherLocation
+
+    note for WeatherLocationRepository "Root Aggregate"
     class WeatherLocationRepository {
+        - WeatherLocationRepository _instance
         - WeatherLocation[] _weather_locations
-        + remove_location(WeatherLocation location)
+        - _init_locations_from_file()
         + add_location(WeatherLocation location)
-        + clear_locations()
+        + WeatherLocation[] get_locations()
+        + String[] get_location_names()
         + WeatherLocation[] find_locations_by_name(String location_name)
         + WeatherLocation find_location_by_name(String location_name)
     }
 
-    note for AnalysisSettingsManager "Root Aggregate"
-    class AnalysisSettingsManager {
-        - WeatherAnalysisSettings _settings
-        - AnalysisSettingsSubscriber[] _subscribers
-        - WeatherLocationRepository _weather_location_repository
-        - notify_subscribers()
-        + subscribe(AnalysisSettingsSubscriber subscriber)
-        + unsubscribe(AnalysisSettingsSubscriber subscriber)
-        + update_settings(String location_name_one, String location_name_two, WeatherMetric metric, WeatherAnalysisType analysis_type, Date date)
-    }
-
-    class WeatherAnalysisSettings {
-        - WeatherAnalysisConfig[] _configs
-        - WeatherAnalysisType _analysis_type
-        + WeatherAnalysisConfig[] configs
-        + WeatherAnalysisType analysis_type()
-    }
-
-    class WeatherAnalysisConfig {
-        - WeatherLocation _location
-        - WeatherMetric _metric
-        - Date _date
-        + WeatherLocation location()
-        + WeatherMetric metric()
-        + Date date()
-    }
-
     class WeatherLocation {
-        - String _name
-        - int _postal_code
-        - float _longitude
-        - float _latitude
-        + String name()
-        + int postal_code()
-        + float longitude()
-        + float latitude()
+        + String name
+        + int postal_code
+        + float longitude
+        + float latitude
     }
+
 ```
 
 ```mermaid
@@ -98,54 +68,55 @@ title: Analyze Context
 classDiagram
 
     WeatherAnalyzer *-- WeatherApi
+    WeatherAnalyzer *-- WeatherLocationRepository
     WeatherAnalyzer *-- WeatherAnalysisResult
-    WeatherAnalysisResult *-- WeatherAnalysisSample
-    WeatherChartAnalysisResult --|> WeatherAnalysisResult
-    WeatherTextAnalysisResult --|> WeatherAnalysisResult
-
+    WeatherAnalyzer *-- WeatherAnalysisSettings
+    WeatherAnalysisResult *-- WeatherAnalysisData
+    WeatherAnalysisResult *-- WeatherMetricEnum
+ 
     note for WeatherApi "Comes from Data Context (Root Aggregate)"
     class WeatherApi {
+        
+    }
+
+    note for WeatherApi "Comes from Location Context (Root Aggregate)"
+    class WeatherLocationRepository {
+        
+    }
+
+    note for WeatherMetricEnum "Comes from Shared Context"
+    class WeatherMetricEnum {
         
     }
 
     note for WeatherAnalyzer "Root Aggregate"
     class WeatherAnalyzer {
         - WeatherApi _weather_api
-        + WeatherAnalysisResult analyze(WeatherAnalysisSettings settings)
+        - WeatherLocationRepository _repository
+        - _validate_settings(WeatherAnalysisSettings settings)
+        + WeatherAnalysisResult[] analyze(WeatherAnalysisSettings settings)
     }
+
+    class WeatherAnalysisSettings {
+        + String[] locations
+        + WeatherMetricEnum[] metrics
+        + Date date
+    }
+
 
     class WeatherAnalysisResult {
-        - WeatherAnalysisSample[] _samples
-        - WeatherMetric _metric
-        - String _title
-        - String _x_axis_label
-        - String _y_axis_label
-        - String _construct_title()
-        + String title()
-        + WeatherAnalysisSample[] samples
-        + String x_axis_label()
-        + String y_axis_label()
+        + WeatherMetricEnum metric
+        + String metric_friendly_name
+        + Date date
+        + WeatherAnalysisData[] results
     }
 
-    class WeatherAnalysisSample {
-        - String _location_name
-        - Date _date
-        - WeatherMetric _metric
-        - float _value
-        + String location_name()
-        + Date date()
-        + float value()
+    class WeatherAnalysisData {
+        + String location_name
+        + float? value
+        + bool has_error
+        + String error_reason
     }
-
-    class WeatherChartAnalysisResult {
-        
-    }
-
-    class WeatherTextAnalysisResult {
-        - String _text
-        + String text()
-    }
-
 ```
 
 ```mermaid
@@ -156,95 +127,39 @@ classDiagram
 
     WeatherApi *-- WeatherDataRequest
     WeatherApi *-- WeatherDataResponse
+    WeatherDataRequest *-- WeatherMetricEnum
+    WeatherDataResponse *-- WeatherMetricEnum
+
+    note for WeatherMetricEnum "Comes from Shared Context"
+    class WeatherMetricEnum {
+        
+    }
 
     note for WeatherApi "Root Aggregate"
     class WeatherApi {
-        - float _get_historical_value(WeatherDataRequest request)
-        - float _get_current_value(WeatherDataRequest request)
-        - float _get_forecast_value(WeatherDataRequest request)
+        - WeatherApi _instance
+        - pd.DataFrame  _create_df_from_variables_with_time(VariablesWithTime variables, String[] metric_keys, bool has_hourly)
+        - float[] _get_historical_values(WeatherDataRequest request, String[] metric_keys)
+        - float[] _get_current_values(WeatherDataRequest request, String[] metric_keys)
+        - float[] _get_forecast_values(WeatherDataRequest request, String[] metric_keys)
+        - String _generate_metric_key(WeatherMetricEnum metric, int altitude_in_meters)
+        - void _ensure_forecast_date(Date forecast_date)
         + WeatherDataResponse make_request(WeatherDataRequest request) 
     }
 
     class WeatherDataRequest {
-        - WeatherLocation _location
-        - Date _date
-        - WeatherMetric _metric
-        + WeatherLocation location()
-        + Date date()
-        + WeatherMetric metric()
+        + WeatherLocation location
+        + Date date
+        + WeatherMetric[] metrics
     }
 
     class WeatherDataResponse {
-        - WeatherLocation _location
-        - Date _date
-        - float _value
-        - WeatherMetric _metric
-        - bool _has_error
-        - String _error_reason
-        + WeatherLocation location()
-        + Date date()
-        + WeatherMetric metric()
-        + float value()
-        + bool has_error()
-        + String error_reason()
-    }
-```
-
-```mermaid
----
-title: Dashboard Context
----
-classDiagram
-
-    WeatherDashboard --|> WeatherAnalysisSettingsSubscriber
-    WeatherDashboard *-- WeatherAnalysisSettingsManager
-    WeatherDashboard *-- WeatherTextWidget
-    WeatherDashboard *-- WeatherChartWidget
-    WeatherChartWidget *-- WeatherChartData
-
-    note for WeatherAnalysisSettingsManager "Comes from the AnalysisSettings Context"
-    class WeatherAnalysisSettingsManager {
-
-    }
-
-    note for WeatherAnalysisSettingsSubscriber "Comes from the AnalysisSettings Context"
-    class WeatherAnalysisSettingsSubscriber {
-
-    }
-
-    note for WeatherDashboard "Root Aggregate"
-    class WeatherDashboard {
-        - WeatherAnalyzer _weather_analyzer
-        - WeatherAnalysisSettingsManager _settings_manager
-        - WeatherAnalysisSettings _current_settings
-        - WeatherTextWidget _text_widget
-        - WeatherChartWidget _chart_widget
-        - WeatherAnalysisSettings _settings
-        - clear_widgets()
-        + on_settings_changed(WeatherAnalysisSettings settings)
-        + reload()
-        + String generate_share_link()
-    }
-
-    class WeatherTextWidget {
-        - String _title
-        - String _text
-        + String title()
-        + String text()
-    }
-
-
-    class WeatherChartWidget {
-        - String _title
-        - WeatherChartData _data
-        + String title()
-        + WeatherChartData data()
-        + bool save_as_image(String path)
-    }
-
-    class WeatherChartData {
-        - Tuple<Date, float>[] _data
-        + Tuple<Date, float>[] data()
+        + WeatherLocation location
+        + Date date
+        + WeatherMetricEnum metrics
+        + float[] values
+        + bool has_error
+        + String error_reason
     }
 ```
 
@@ -256,7 +171,8 @@ title: Context Mapping
 ---
 flowchart BT
     AnalyzeContext --> DataContext
-    DashboardContext --> AnalyzeContext
-    DashboardContext --> AnalysisSettingsContext
+    AnalyzeContext --> LocationContext
+    AnalyzeContext --> SharedContext
+    DataContext --> SharedContext
 ```
 
