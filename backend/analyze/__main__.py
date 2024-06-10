@@ -6,6 +6,8 @@ from analyze.weather_analyzer import WeatherAnalyzer
 
 if __name__ == "__main__":
     try:
+        # Create an instance of the Weather Analyzer and make a request for Chur and Buchs.
+        # We want to compare todays temperature and amount of rain.
         analyzer = WeatherAnalyzer()
         analysis_settings = WeatherAnalysisSettings(
             locations=["Chur", "Buchs SG"],

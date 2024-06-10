@@ -5,6 +5,11 @@ from pyproj import Transformer
 import json
 
 if __name__ == "__main__":
+    """The purpose of this script is to generate a JSON file which contains the longitude and latitude values for each location in Switzerland
+
+    The used data can be found under the following URL: https://www.swisstopo.admin.ch/de/amtliches-ortschaftenverzeichnis
+    """
+
     INPUT_FILE_PATH = "scripts/city_names.csv"
     OUTPUT_FILE_PATH = "scripts/cities.json"
 
@@ -19,10 +24,12 @@ if __name__ == "__main__":
     def convert_lv95_to_latlong_coordinates(
         east: float, north: float
     ) -> tuple[float, float]:
+        """Converts LV95 Coordinates into Latitude and Longitude"""
         lat, lon = TRANSFORMER.transform(east, north)
         return (lat, lon)
 
     def validate_csv_keys(row: dict) -> bool:
+        """Validates that the expected keys in the CSV File are there."""
         keys_to_validate = [
             CITY_NAME_KEY,
             PLZ_KEY,
@@ -41,6 +48,7 @@ if __name__ == "__main__":
                 valid = False
         return valid
 
+    # Open and read csv file.
     if not os.path.isfile(INPUT_FILE_PATH):
         print(f"Could not find file {INPUT_FILE_PATH}")
         sys.exit(1)
@@ -54,6 +62,7 @@ if __name__ == "__main__":
                 print("CSV File does not contain expected keys")
                 sys.exit(1)
 
+            # Extract necessary information
             city_name = row[CITY_NAME_KEY]
             postal_code = int(row[PLZ_KEY])
             east_coordinate = float(row[EAST_COORDINATE_KEY])
@@ -62,6 +71,7 @@ if __name__ == "__main__":
                 east_coordinate, north_coordinate
             )
 
+            # Create dictionary object and append it to the list
             city = {
                 "name": city_name,
                 "postal_code": postal_code,
@@ -71,6 +81,7 @@ if __name__ == "__main__":
 
             cities.append(city)
 
+    # Write the JSON file.
     with open(OUTPUT_FILE_PATH, "w", encoding="utf-8") as f:
         json.dump(cities, f, indent=2)
     print(f"Successfully wrote file {OUTPUT_FILE_PATH}")

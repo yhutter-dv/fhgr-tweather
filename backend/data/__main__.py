@@ -8,6 +8,8 @@ from data.weather_data_request import WeatherDataRequest
 if __name__ == "__main__":
     try:
         api = WeatherApi()
+
+        # Location is set to Chur
         location = WeatherLocation(
             name="Chur", latitude=46.8590, longitude=9.533, postal_code=7000
         )
@@ -18,6 +20,7 @@ if __name__ == "__main__":
         # request_date = date.today() + timedelta(days=9)
         # request_date = date.today()
 
+        # Make a request for temperature, rain and snowfall.
         request = WeatherDataRequest(
             location=location,
             date=request_date,

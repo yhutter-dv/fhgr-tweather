@@ -10,11 +10,17 @@ from data.weather_data_response import WeatherDataResponse
 
 
 class WeatherApi:
-    # TODO: Perhaps move these values inside a config file
+    """The Weather API is responsible for retrieving the raw data from 'Open-Meteo'.
+
+    This class is implemented as a singleton.
+    """
+
+    # We could move these values inside a config file
     FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
     HISTORICAL_URL = "https://archive-api.open-meteo.com/v1/era5"
 
     # Technically up to 16 days of forecast are possible
+    # See https://open-meteo.com/en/docs
     MAX_FORECAST_DAYS = 16
 
     _instance = None
@@ -30,6 +36,13 @@ class WeatherApi:
     def _create_df_from_variables_with_time(
         self, variables: VariablesWithTime, metric_keys: list[str], has_hourly=True
     ) -> pd.DataFrame:
+        """Helper method to construct DataFrame according to the given metric keys.
+
+        The open-meteo Library makes it somewhat inconvenient to work with Variables.
+        This method returns a pandas DataFrame with a date_time column as well as the metric keys as separate columns.
+        """
+
+        # Construct the date_time column
         data: dict = {
             "date_time": pd.date_range(
                 start=pd.to_datetime(variables.Time(), unit="s"),
@@ -39,7 +52,7 @@ class WeatherApi:
             ),
         }
 
-        # Currently we can always assume that we only have one variable because we only support one metric at a time.
+        # Extract the values for a given metric
         for index, metric_key in enumerate(metric_keys):
             metric_variable = variables.Variables(index)
             if metric_variable is None:
@@ -51,13 +64,18 @@ class WeatherApi:
                 else metric_variable.Value()
             )
 
+        # Construct the DataFrame
         df = pd.DataFrame(data)
+
+        # Drop any missing values
         df.dropna(inplace=True)
         return df
 
     def _get_historical_values(
         self, request: WeatherDataRequest, metric_keys: list[str]
     ) -> list[float]:
+        """Gets historical values for the given metric keys."""
+
         date_str = f"{request.date}"
         params = {
             "latitude": request.location.latitude,
@@ -68,17 +86,15 @@ class WeatherApi:
         }
         responses = self._client.weather_api(self.FORECAST_URL, params)
 
-        # Because we could speficy multiple location we need to specify an index for telling which location we want to have.
+        # Get the response and check if we have any hourly data.
         response = responses[0]
         hourly = response.Hourly()
         if hourly is None:
-            raise Exception(
-                "No hourly data received for request make_historical_request"
-            )
+            raise Exception("No hourly data received for Historical Request")
 
         df = self._create_df_from_variables_with_time(hourly, metric_keys=metric_keys)
 
-        # Filter out the data which matches the date and return the latest one
+        # Filter out the data which matches the request data
         values_for_date = df[df["date_time"].dt.date == request.date]
 
         if not isinstance(values_for_date, pd.DataFrame):
@@ -87,12 +103,15 @@ class WeatherApi:
         if values_for_date.empty:
             raise Exception(f"No data found for date '{request.date}'")
 
+        # Only take the latest value
         values = [values_for_date[metric_key].iloc[-1] for metric_key in metric_keys]
         return values
 
     def _get_forecast_values(
         self, request: WeatherDataRequest, metric_keys: list[str]
     ) -> list[float]:
+        """Gets forecast values for the given metric keys."""
+
         params = {
             "latitude": request.location.latitude,
             "longitude": request.location.longitude,
@@ -101,15 +120,15 @@ class WeatherApi:
         }
         responses = self._client.weather_api(self.FORECAST_URL, params)
 
-        # Because we could speficy multiple location we need to specify an index for telling which location we want to have.
+        # Get the response and check if we have any hourly data.
         response = responses[0]
         hourly = response.Hourly()
         if hourly is None:
-            raise Exception("No hourly data received for request make_forecast_request")
+            raise Exception("No hourly data received for Forecast request")
 
         df = self._create_df_from_variables_with_time(hourly, metric_keys=metric_keys)
 
-        # Filter out the data which matches the date and return the latest one
+        # Filter out the data which matches the request date
         values_for_date = df[df["date_time"].dt.date == request.date]
 
         if not isinstance(values_for_date, pd.DataFrame):
@@ -118,12 +137,14 @@ class WeatherApi:
         if values_for_date.empty:
             raise Exception(f"No data found for date '{request.date}'")
 
+        # Only take the latest value
         values = [values_for_date[metric_key].iloc[-1] for metric_key in metric_keys]
         return values
 
     def _get_current_values(
         self, request: WeatherDataRequest, metric_keys: list[str]
     ) -> list[float]:
+        """Gets current values for the given metric keys."""
         params = {
             "latitude": request.location.latitude,
             "longitude": request.location.longitude,
@@ -131,23 +152,29 @@ class WeatherApi:
         }
         responses = self._client.weather_api(self.FORECAST_URL, params)
 
-        # Because we could speficy multiple location we need to specify an index for telling which location we want to have.
+        # Get the response and check if we have any current data.
         response = responses[0]
         current = response.Current()
         if current is None:
-            raise Exception("No current data received for request make_current_request")
+            raise Exception("No current data received for Current Request")
 
         df = self._create_df_from_variables_with_time(
             current, metric_keys=metric_keys, has_hourly=False
         )
 
+        # Extract the latest values
         values = [df[metric_key].iloc[-1] for metric_key in metric_keys]
         return values
 
     def _generate_metric_key(
         self, metric: WeatherMetricEnum, altitude_in_meters: int
     ) -> str | None:
-        # For supported metrics see: https://open-meteo.com/en/docs
+        """Generates a metric key given a specific metric.
+
+        This key is used for the open-meteo requests
+        For supported metrics see: https://open-meteo.com/en/docs
+        """
+
         match metric:
             case WeatherMetricEnum.TEMPERATURE:
                 return f"{metric}_{altitude_in_meters}m"
@@ -161,6 +188,8 @@ class WeatherApi:
                 return f"{metric}"
 
     def _ensure_forecast_date(self, forecast_date: date):
+        """Ensures that the forecast date is not beyond the maximum supported forecast date."""
+
         today = date.today()
         max_forecast_date = today + timedelta(days=self.MAX_FORECAST_DAYS)
         if forecast_date > max_forecast_date:
@@ -169,7 +198,12 @@ class WeatherApi:
             )
 
     def make_request(self, request: WeatherDataRequest) -> WeatherDataResponse:
+        """Makes a reuqest to the open-meteo API.
+
+        If any errors happen the 'has_error' and 'error_reason' fields are set.
+        """
         try:
+            # Generate the metric keys which are needed for the Open-Meteo API.
             metric_keys = [
                 self._generate_metric_key(key, altitude_in_meters=2)
                 for key in request.metrics
@@ -196,6 +230,7 @@ class WeatherApi:
             # Convert to float (needed because we get numpy.float type)
             values = [float(value) for value in values]
 
+            # Construct a valid response
             response = WeatherDataResponse(
                 location=request.location,
                 metrics=request.metrics,
@@ -206,6 +241,7 @@ class WeatherApi:
             )
             return response
         except Exception as ex:
+            # In case of any error construct an invalid response and set the error reason etc.
             response = WeatherDataResponse(
                 location=request.location,
                 metrics=request.metrics,
