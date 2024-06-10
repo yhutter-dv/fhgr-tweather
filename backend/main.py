@@ -9,19 +9,19 @@ from shared.weather_metric_enum import WeatherMetricEnum
 
 weather_location_repository = WeatherLocationRepository()
 weather_analyzer = WeatherAnalyzer()
+metric_enums = [
+    WeatherMetricEnum(WeatherMetricEnum.TEMPERATURE),
+    WeatherMetricEnum(WeatherMetricEnum.HUMIDTY),
+    WeatherMetricEnum(WeatherMetricEnum.SNOWFALL),
+    WeatherMetricEnum(WeatherMetricEnum.RAIN),
+]
 metrics = [
     WeatherMetric(
-        identifier=WeatherMetricEnum.TEMPERATURE,
-        title="Temperature",
-        description="Temperature in °C",
-    ),
-    WeatherMetric(identifier=WeatherMetricEnum.RAIN, title="Rain", description="Rain"),
-    WeatherMetric(
-        identifier=WeatherMetricEnum.HUMIDTY, title="Humidity", description="Humidity"
-    ),
-    WeatherMetric(
-        identifier=WeatherMetricEnum.SNOWFALL, title="Snowfall", description="Snowfall"
-    ),
+        identifier=metric,
+        title=metric.title(),
+        description=metric.description(),
+    )
+    for metric in metric_enums
 ]
 
 app = FastAPI()
