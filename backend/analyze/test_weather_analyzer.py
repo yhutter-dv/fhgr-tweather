@@ -109,3 +109,4 @@ class TestWeatherAnalyzer(unittest.TestCase):
 
         # Validate value
         self.assertIsNotNone(analysis_result[1].results[0].value)
+        self.assertIsNotNone(analysis_result[1].results[1].value)
