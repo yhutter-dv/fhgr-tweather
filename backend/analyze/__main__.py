@@ -11,7 +11,10 @@ if __name__ == "__main__":
         analyzer = WeatherAnalyzer()
         analysis_settings = WeatherAnalysisSettings(
             locations=["Chur", "Buchs SG"],
-            metrics=[WeatherMetricEnum.TEMPERATURE, WeatherMetricEnum.RAIN],
+            metrics=[
+                WeatherMetricEnum(WeatherMetricEnum.TEMPERATURE),
+                WeatherMetricEnum(WeatherMetricEnum.RAIN),
+            ],
             date=date.today(),
         )
         result = analyzer.analyze(analysis_settings)

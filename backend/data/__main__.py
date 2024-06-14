@@ -25,9 +25,9 @@ if __name__ == "__main__":
             location=location,
             date=request_date,
             metrics=[
-                WeatherMetricEnum.TEMPERATURE,
-                WeatherMetricEnum.RAIN,
-                WeatherMetricEnum.SNOWFALL,
+                WeatherMetricEnum(WeatherMetricEnum.TEMPERATURE),
+                WeatherMetricEnum(WeatherMetricEnum.RAIN),
+                WeatherMetricEnum(WeatherMetricEnum.SNOWFALL),
             ],
         )
         respone = api.make_request(request)
