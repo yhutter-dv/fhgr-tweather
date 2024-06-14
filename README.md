@@ -23,6 +23,47 @@ The script can be found under `scripts/preprocess_city_names.py` and does the fo
 - Converts LV95 Coordinates into Latitude and Longitude Coordinates
 - Extracts city name as well as postal code
 
+## Setup
+These steps only need to be done one time.
+
+### Backend
+First change into the `backend` directory and create a `virtual environment`. Run the following commands depending on your Operating System:
+
+#### MacOS and Linux
+
+```bash
+cd backend
+python3 -m venv ./venv
+source ./venv/bin/activate
+```
+
+Then install all required packages `see dependencies in pyproject.toml`:
+
+```bash
+pip3 install .
+```
+
+#### Windows
+
+```bash
+cd backend
+python -m venv ./venv
+source .\venv\Scripts\activate.bat 
+```
+Then install all required packages `see dependencies in pyproject.toml`:
+
+```bash
+pip install .
+```
+
+### Frontend
+Change into the `frontend` directory and install all required packages by runnin the following command:
+
+```bash
+cd backend
+npm i
+```
+
 ## Architecture
 The Application is split up into a `frontend` and `backend` Part.
 
@@ -39,6 +80,9 @@ The backend itself is written with Python and [FastApi](https://fastapi.tiangolo
 For more information about the Software Architecture also see `doc/architecture.md`.
 
 ## Main Packages
+
+> Please note that in order for this to work you have to have your Virtual Environment activated.
+
 The Backend is split up into three different packages. The Main Application Entry Point is the `analyze` package.
 
 In order to get a feel at how to use the different packages a corresponding `__main__.py` file was created. In order to run it for a corresponding package run the following command (depending on your Operating System)
@@ -73,51 +117,9 @@ cd backend
 python -m unittest discover -v 
 ```
 
-## Setup
-These steps only need to be done one time.
-
-### Backend
-First change into the `backend` directory and create a `virtual environment`. Run the following commands depending on your Operating System:
-
-#### MacOS and Linux
-
-```bash
-cd backend
-python3 -m venv ./venv
-source ./venv/bin/activate # Linux and MacOS
-```
-
-Then install all required packages `see dependencies in pyproject.toml`:
-
-```bash
-pip3 install .
-```
-
-#### MacOS and Linux
-
-```bash
-cd backend
-python -m venv ./venv
-./venv/Scripts/activate.bat # Windows
-```
-
-Then install all required packages `see dependencies in pyproject.toml`:
-
-```bash
-pip install .
-```
-
-### Frontend
-Change into the `frontend` directory and install all required packages by runnin the following command:
-
-```bash
-cd backend
-npm i
-```
-
 ## Running the Application
 
-> :warning: Please make sure that the Backend is started before the Frontend.
+> :warning: Please make sure that the Backend is started before the Frontend and that you have your Python Virtual Environment activated.
 
 ### Backend
 
