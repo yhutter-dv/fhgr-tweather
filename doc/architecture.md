@@ -79,7 +79,7 @@ classDiagram
         
     }
 
-    note for WeatherApi "Comes from Location Context (Root Aggregate)"
+    note for WeatherLocationRepository "Comes from Location Context (Root Aggregate)"
     class WeatherLocationRepository {
         
     }
